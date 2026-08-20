@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phần Mềm Giảng Dạy: Tổng Quan Nghiệp Vụ Hải Quan</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- html2pdf.js Thư viện Xuất PDF A4 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-blue: #E8F1F5;      /* Xanh nhạt chủ đạo */
+            --accent-blue: #0056b3;       /* Xanh đậm nhấn */
+            --soft-yellow: #FFF9E6;       /* Vàng nhạt */
+            --border-yellow: #FFE082;     /* Viền vàng */
+            --bright-red: #D90429;        /* Đỏ tươi Hải quan */
+            --dark-red: #9B001C;          /* Đỏ đậm */
+            --text-main: #2B2D42;         /* Màu chữ chính */
+            --bg-white: #FFFFFF;
+            --success-green: #28a745;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-blue);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-white);
+            border-right: 3px solid var(--bright-red);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 20px;
+            background: var(--bright-red);
+            color: white;
+            text-align: center;
+        }
+
+        .brand h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .brand p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 15px 0;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            border-left: 4px solid transparent;
+            user-select: none;
+        }
+
+        .nav-item:hover {
+            background-color: var(--primary-blue);
+            color: var(--bright-red);
+        }
+
+        .nav-item.active {
+            background-color: var(--soft-yellow);
+            color: var(--bright-red);
+            border-left-color: var(--bright-red);
+            font-weight: 700;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header-bar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--accent-blue);
+        }
+
+        .header-bar h2 {
+            color: var(--bright-red);
+            font-size: 1.4rem;
+        }
+
+        /* Content Sections */
+        .section-panel {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .section-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Callout Boxes */
+        .callout-box {
+            background-color: var(--soft-yellow);
+            border-left: 4px solid #F59E0B;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+
+        .callout-box.info {
+            background-color: #E0F2FE;
+            border-left-color: #0284C7;
+        }
+
+        .callout-box h4 {
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        /* Objectives Grid */
+        .obj-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .obj-card {
+            background: var(--primary-blue);
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 4px solid var(--bright-red);
+        }
+
+        .obj-card h3 {
+            color: var(--bright-red);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .obj-card ul {
+            padding-left: 20px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Interactive Timeline */
+        .timeline {
+            position: relative;
+            margin: 20px 0;
+            padding-left: 30px;
+            border-left: 3px solid var(--bright-red);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--bright-red);
+            transition: all 0.2s;
+        }
+
+        .timeline-item.active::before {
+            background: var(--bright-red);
+            transform: scale(1.3);
+        }
+
+        .timeline-content {
+            background: var(--primary-blue);
+            padding: 15px 20px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .timeline-item:hover .timeline-content {
+            background: var(--soft-yellow);
+        }
+
+        .timeline-year {
+            font-weight: 700;
+            color: var(--bright-red);
+            font-size: 1.1rem;
+        }
+
+        /* Interactive Simulators */
+        .simulator-container {
+            border: 2px dashed var(--accent-blue);
+            padding: 20px;
+            border-radius: 8px;
+            background: #F8FAFC;
+            margin-top: 20px;
+        }
+
+        .sim-btn {
+            background: var(--bright-red);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .sim-btn:hover {
+            background: var(--dark-red);
+        }
+
+        .channel-tag {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .channel-green { background-color: var(--success-green); }
+        .channel-yellow { background-color: #D97706; }
+        .channel-red { background-color: var(--bright-red); }
+
+        /* Custom Exercise Styling */
+        .exercise-card {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-left: 5px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .exercise-card.excel-type {
+            border-left-color: #107C41; /* Microsoft Excel Green */
+        }
+
+        .exercise-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .exercise-scenario {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px dashed #CBD5E1;
+            margin-bottom: 12px;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        .exercise-questions {
+            margin-left: 20px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .btn-toggle-answer {
+            background: #E2E8F0;
+            color: var(--text-main);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-toggle-answer:hover {
+            background: #CBD5E1;
+        }
+
+        .answer-box {
+            display: none;
+            margin-top: 12px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Custom Table Styling */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .custom-table th, .custom-table td {
+            border: 1px solid #CBD5E1;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .custom-table th {
+            background-color: #F1F5F9;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .excel-badge {
+            background-color: #107C41;
+            color: white;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* STYLES CHO TAB KIỂM TRA & BÀI TẬP 20 */
+        .student-info-box {
+            background: #F1F5F9;
+            border: 2px dashed var(--accent-blue);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .student-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #CBD5E1;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+
+        .student-test-item {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .student-test-item h5 {
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .test-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .test-options label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .student-test-item textarea {
+            width: 100%;
+            height: 70px;
+            padding: 10px;
+            border: 1px solid #CBD5E1;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-top: 8px;
+        }
+
+        /* ĐÁP ÁN CHUẨN DÀNH CHO GIẢNG VIÊN */
+        .gv-answer-key {
+            display: none; /* Ẩn mặc định cho sinh viên */
+            margin-top: 10px;
+            background-color: #E6F4EA;
+            border: 1px solid #A8DADC;
+            border-left: 4px solid var(--success-green);
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #1E4620;
+        }
+
+        .gv-answer-key strong {
+            color: var(--success-green);
+        }
+
+        .pdf-export-controls {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 15px;
+            border-bottom: 2px solid var(--primary-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        /* Định dạng file xuất PDF */
+        #pdf-render-area {
+            background: white;
+            padding: 10px;
+        }
+
+        .pdf-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-header h2 {
+            color: #000;
+            font-size: 16pt;
+            text-transform: uppercase;
+        }
+
+        .pdf-student-info {
+            margin-bottom: 20px;
+            font-size: 11pt;
+            line-height: 1.6;
+        }
+
+        .pdf-item {
+            margin-bottom: 12pt;
+            page-break-inside: avoid;
+        }
+
+        .pdf-item-title {
+            font-weight: bold;
+            font-size: 10.5pt;
+            margin-bottom: 4pt;
+        }
+
+        .pdf-item-answer {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 6pt 10pt;
+            font-size: 10pt;
+            border-radius: 4px;
+        }
+
+        /* Modal nhập mật khẩu GV */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal-box h3 {
+            color: var(--bright-red);
+            margin-bottom: 15px;
+        }
+
+        .modal-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #CBD5E1;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-modal {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-confirm { background: var(--success-green); color: white; }
+        .btn-cancel { background: #64748B; color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-ship fa-2x"></i>
+            <h1 style="margin-top: 8px;">HẢI QUAN VIỆT NAM</h1>
+            <p>Phần Mềm Giảng Dạy Trực Quan</p>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="switchTab(this, 'tab-overview')">
+                <i class="fa-solid fa-bullseye"></i> 1. Mục tiêu Chương
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-intro')">
+                <i class="fa-solid fa-book-open"></i> 1.1 Khái quát & Vai trò
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-history')">
+                <i class="fa-solid fa-timeline"></i> 1.2 Lịch sử Hải quan
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-hs')">
+                <i class="fa-solid fa-barcode"></i> 1.3.1 Công ước HS
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-kyoto')">
+                <i class="fa-solid fa-sliders"></i> 1.3.2 Công ước Kyoto (RKC)
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-istanbul')">
+                <i class="fa-solid fa-passport"></i> 1.3.3 Sổ ATA Carnet
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-tfa-asean')">
+                <i class="fa-solid fa-network-wired"></i> 1.3.4 & 1.3.5 TFA & ASEAN
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-quiz')">
+                <i class="fa-solid fa-graduation-cap"></i> Bài tập Củng cố (13 Bài)
+            </li>
+            <!-- TAB KIỂM TRA MỚI BỔ SUNG -->
+            <li class="nav-item" onclick="switchTab(this, 'tab-test-exam')" style="background-color: #FEF2F2; color: var(--bright-red);">
+                <i class="fa-solid fa-file-pen"></i> 9. Kiểm tra (20 Bài tập)
+            </li>
+        </ul>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="main-content">
+        <!-- HEADER BAR -->
+        <header class="header-bar">
+            <div>
+                <span style="font-size: 0.85rem; color: #64748B; font-weight: 500;">MÔN HỌC: KHAI BÁO HẢI QUAN</span>
+                <h2 id="current-title">CHƯƠNG 1: MỤC TIÊU HỌC TẬP</h2>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="role-badge" style="background: var(--soft-yellow); border: 1px solid var(--border-yellow); padding: 6px 12px; border-radius: 20px; font-weight: bold; color: var(--bright-red); font-size: 0.85rem;">
+                    <i class="fa-solid fa-user-graduate"></i> Chế độ: Sinh viên
+                </span>
+                <!-- NÚT CHUYỂN ĐỔI CHẾ ĐỘ GIẢNG VIÊN (GV) -->
+                <button id="btn-gv-toggle" onclick="handleGVToggle()" style="background: var(--accent-blue); color: white; border: none; padding: 7px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px;">
+                    <i class="fa-solid fa-user-tie"></i> <span id="btn-gv-text"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- TAB 1: MỤC TIÊU CHƯƠNG -->
+        <section id="tab-overview" class="section-panel active">
+            <h2 style="color: var(--bright-red); margin-bottom: 15px;">Mục Tiêu Học Tập Chương 1</h2>
+            <p style="line-height: 1.6; color: #475569;">
+                Chương này trang bị cho sinh viên nền tảng lý luận, lịch sử phát triển và khung pháp lý quốc tế về nghiệp vụ hải quan, tạo tiền đề chuẩn xác cho hoạt động khai báo hải quan thực tế.
+            </p>
+
+            <div class="obj-grid">
+                <div class="obj-card">
+                    <h3><i class="fa-solid fa-brain"></i> Kiến Thức</h3>
+                    <ul>
+                        <li>Nắm vững khái niệm, chức năng, vai trò của Hải quan trong nền kinh tế.</li>
+                        <li>Trình bày các mốc lịch sử hình thành Hải quan VN.</li>
+                        <li>Hiểu và vận dụng các Công ước/Hiệp định quốc tế (HS, RKC, ATA, TFA, ATIGA, ASW).</li>
+                    </ul>
+                </div>
+
+                <div class="obj-card" style="border-top-color: var(--accent-blue);">
+                    <h3 style="color: var(--accent-blue);"><i class="fa-solid fa-gears"></i> Kỹ Năng</h3>
+                    <ul>
+                        <li>Phân tích & nhận diện đúng chức năng của Hải quan trong các tình huống thương mại.</li>
+                        <li>Xử lý bài tập thực tế khi áp dụng quy tắc phân loại HS & tạm nhập tái xuất.</li>
+                    </ul>
+                </div>
+
+                <div class="obj-card" style="border-top-color: #F59E0B;">
+                    <h3 style="color: #D97706;"><i class="fa-solid fa-scale-balanced"></i> Thái Độ</h3>
+                    <ul>
+                        <li>Nhận thức rõ trách nhiệm chuyên nghiệp của người làm thủ tục khai báo.</li>
+                        <li>Tuân thủ tuyệt đối pháp luật Hải quan và chuẩn mực nghiệp vụ.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="callout-box" style="margin-top: 25px;">
+                <h4><i class="fa-solid fa-lightbulb"></i> Lời khuyên cho Giảng viên:</h4>
+                <p>Sử dụng các công cụ mô phỏng trực quan ở các Tab tiếp theo để giúp sinh viên hình dung cách các Công ước quốc tế can thiệp trực tiếp vào quy trình thông quan hàng hóa.</p>
+            </div>
+        </section>
+
+        <!-- TAB 2: KHÁI QUÁT VÀ VAI TRÒ -->
+        <section id="tab-intro" class="section-panel">
+            <h3 style="color: var(--bright-red); border-bottom: 2px solid var(--primary-blue); padding-bottom: 8px;">1.1.1. Khái Niệm Nghiệp Vụ Hải Quan</h3>
+            <p style="margin: 15px 0; line-height: 1.7;">
+                <strong>Nghiệp vụ hải quan</strong> là toàn bộ các hoạt động liên quan đến <em>kiểm tra, giám sát, quản lý</em> hàng hóa, phương tiện vận tải xuất khẩu – nhập khẩu, thu thuế và thực thi các chính sách quản lý nhà nước tại biên giới.
+            </p>
+
+            <h3 style="color: var(--bright-red); margin-top: 25px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 8px;">1.1.2. Vai Trò Trong Thương Mại Quốc Tế</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 15px;">
+                <div style="background: var(--primary-blue); padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--bright-red);"><i class="fa-solid fa-shield-halved"></i> 1. Bảo vệ lợi ích quốc gia</h4>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Chống buôn lậu, gian lận thương mại, ngăn chặn hàng cấm nhập cảnh.</p>
+                </div>
+                <div style="background: var(--primary-blue); padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--accent-blue);"><i class="fa-solid fa-truck-fast"></i> 2. Thúc đẩy lưu thông hàng hóa</h4>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Đơn giản hóa thủ tục, ứng dụng Công nghệ thông tin để thông quan nhanh.</p>
+                </div>
+                <div style="background: var(--primary-blue); padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #D97706;"><i class="fa-solid fa-coins"></i> 3. Kiểm soát thuế & phí</h4>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Thu đúng, thu đủ thuế XNK, đảm bảo nguồn thu ngân sách nhà nước.</p>
+                </div>
+                <div style="background: var(--primary-blue); padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--success-green);"><i class="fa-solid fa-chart-pie"></i> 4. Thống kê thương mại</h4>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Cung cấp dữ liệu XNK chính xác phục vụ hoạch định chính sách vĩ mô.</p>
+                </div>
+            </div>
+
+            <div class="callout-box" style="margin-top: 20px;">
+                <h4 style="color: var(--bright-red);"><i class="fa-solid fa-file-invoice"></i> VÍ DỤ THỰC TẾ 1: Tối ưu hóa nhờ Hệ thống VNACCS</h4>
+                <p style="margin-top: 8px; line-height: 1.6;">
+                    Công ty A nhập khẩu <strong>10 container linh kiện điện tử</strong>. Nhờ hệ thống Hải quan điện tử VNACCS, doanh nghiệp khai báo trực tuyến và được hệ thống phân vào <strong>Luồng Xanh</strong>. Hàng hóa được thông quan ngay lập tức mà không cần kiểm tra hồ sơ giấy.
+                </p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; font-weight: bold; font-size: 0.85rem; color: var(--accent-blue);">
+                    <span>✔ Giảm chi phí lưu kho bãi</span>
+                    <span>✔ Kịp tiến độ sản xuất dây chuyền</span>
+                    <span>✔ Nâng cao năng lực cạnh tranh</span>
+                </div>
+            </div>
+
+            <h3 style="color: var(--bright-red); margin-top: 25px;">1.1.3. Mối Quan Hệ Với Nghề Nghiệp Logistics</h3>
+            <p style="margin-top: 8px;">Môn học hỗ trợ sinh viên khi ra trường làm việc tại các Công ty XNK, Forwarder, Hãng tàu:</p>
+            <ul style="margin-left: 20px; margin-top: 5px; line-height: 1.6;">
+                <li>Thực hiện chính xác khai báo tờ khai Hải quan.</li>
+                <li>Phối hợp nhịp nhàng với công chức Hải quan tại cửa khẩu.</li>
+                <li>Hạn chế tối đa rủi ro phạt hành chính do khai sai mã hoặc trị giá.</li>
+            </ul>
+        </section>
+
+        <!-- TAB 3: LỊCH SỬ HẢI QUAN -->
+        <section id="tab-history" class="section-panel">
+            <h3 style="color: var(--bright-red);">1.2. Lịch Sử Hình Thành & Phát Triển Hải Quan Việt Nam</h3>
+            <p style="margin-bottom: 15px; color: #64748B;">Nhấp vào các mốc thời gian để khám phá đặc điểm từng thời kỳ:</p>
+
+            <div class="timeline">
+                <div class="timeline-item active" onclick="showHistoryDetail(this, 1)">
+                    <div class="timeline-content">
+                        <span class="timeline-year">Trước năm 1945</span>
+                        <h4>Thời kỳ Pháp thuộc</h4>
+                        <p style="font-size: 0.9rem;">Hệ thống Thuế quan do chính quyền thực dân Pháp kiểm soát, mục đích chính là bóc lột và thu thuế phục vụ chính quốc.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item" onclick="showHistoryDetail(this, 2)">
+                    <div class="timeline-content">
+                        <span class="timeline-year">10/09/1945 – 1975</span>
+                        <h4>Sắc lệnh 27/SL & Kháng chiến</h4>
+                        <p style="font-size: 0.9rem;">Chủ tịch Hồ Chí Minh ký Sắc lệnh 27/SL thành lập <em>Sở Thuế quan và Thuế gián thu</em>. Hải quan kiểm soát vật tư chiến lược, chống buôn lậu phục vụ kháng chiến.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item" onclick="showHistoryDetail(this, 3)">
+                    <div class="timeline-content">
+                        <span class="timeline-year">1975 – 1990</span>
+                        <h4>Thống nhất & Thời kỳ Bao cấp</h4>
+                        <p style="font-size: 0.9rem;">Thống nhất quản lý Hải quan toàn quốc. Tập trung quản lý hàng hóa viện trợ, hàng mậu dịch quốc doanh.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item" onclick="showHistoryDetail(this, 4)">
+                    <div class="timeline-content">
+                        <span class="timeline-year">1990 – 2000</span>
+                        <h4>Đổi mới & Hiện đại hóa</h4>
+                        <p style="font-size: 0.9rem;">Bắt đầu bước chuyển mình hiện đại hóa, từng bước áp dụng công nghệ thông tin vào công tác nghiệp vụ.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item" onclick="showHistoryDetail(this, 5)">
+                    <div class="timeline-content">
+                        <span class="timeline-year">2000 – Nay</span>
+                        <h4>Hải quan Điện tử & Hải quan Số</h4>
+                        <p style="font-size: 0.9rem;">Triển khai Hệ thống thông quan tự động VNACCS/VCIS. Hướng tới Hải quan Số, Hải quan Thông minh và kết nối Một cửa Quốc gia.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-detail-box" class="callout-box info">
+                <h4><i class="fa-solid fa-clock-rotate-left"></i> Chi tiết mốc lịch sử:</h4>
+                <p id="history-detail-text">Trước 1945: Hệ thống thuế quan tập trung thu thuế tối đa cho chính quyền thực dân Pháp, chưa có tính chất phục vụ phát triển thương mại tự do.</p>
+            </div>
+        </section>
+
+        <!-- TAB 4: CÔNG ƯỚC HS -->
+        <section id="tab-hs" class="section-panel">
+            <h3 style="color: var(--bright-red);">1.3.1. Công Ước HS (Harmonized System)</h3>
+            <p style="margin-top: 10px; line-height: 1.6;">
+                Do <strong>Tổ chức Hải quan Thế giới (WCO)</strong> xây dựng nhằm thiết lập Danh mục mô tả và mã hóa hàng hóa thống nhất toàn cầu (mã 6 chữ số chuẩn). Áp dụng trên 200 quốc gia.
+            </p>
+
+            <div style="margin-top: 15px; background: var(--primary-blue); padding: 15px; border-radius: 8px;">
+                <h4 style="color: var(--accent-blue);">Cấu trúc mã HS tiêu chuẩn:</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-weight: bold; font-family: monospace; font-size: 1.1rem;">
+                    <span style="background: white; padding: 5px 10px; border-radius: 4px; border: 1px solid #CBD5E1;">[XX] Chương</span>
+                    <span style="background: white; padding: 5px 10px; border-radius: 4px; border: 1px solid #CBD5E1;">[XX] Nhóm</span>
+                    <span style="background: white; padding: 5px 10px; border-radius: 4px; border: 1px solid #CBD5E1;">[XX] Phân nhóm (WCO)</span>
+                    <span style="background: var(--soft-yellow); padding: 5px 10px; border-radius: 4px; border: 1px solid var(--border-yellow); color: var(--bright-red);">[XX] Mã riêng Quốc gia/ASEAN</span>
+                </div>
+            </div>
+
+            <div class="simulator-container">
+                <h4 style="color: var(--bright-red);"><i class="fa-solid fa-magnifying-glass"></i> MÔ PHỎNG PHÂN LOẠI MÃ HS THỰC TẾ (VÍ DỤ 2)</h4>
+                <p style="font-size: 0.9rem; margin-top: 5px;">Chọn mặt hàng nhập khẩu để xem phân loại chuẩn hóa theo Công ước HS:</p>
+                
+                <select id="hs-select" style="width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #CBD5E1;" onchange="updateHSSimulator()">
+                    <option value="keyboard">Lô hàng 5.000 Bàn phím máy tính</option>
+                    <option value="fan">Lô hàng Quạt điện dùng trong gia đình</option>
+                </select>
+
+                <div id="hs-result" class="callout-box" style="margin-top: 15px;"></div>
+            </div>
+        </section>
+
+        <!-- TAB 5: CÔNG ƯỚC KYOTO SỬA ĐỔI -->
+        <section id="tab-kyoto" class="section-panel">
+            <h3 style="color: var(--bright-red);">1.3.2. Công Ước Kyoto Sửa Đổi (RKC)</h3>
+            <p style="margin-top: 8px; line-height: 1.6;">
+                Chuẩn mực quốc tế về đơn giản hóa, hài hòa hóa quy trình thủ tục hải quan. Trọng tâm cốt lõi là chuyển từ <em>Kiểm tra 100% truyền thống</em> sang <strong>Quản lý Rủi ro (Risk Management)</strong>.
+            </p>
+
+            <div class="simulator-container">
+                <h4 style="color: var(--accent-blue);"><i class="fa-solid fa-diagram-project"></i> MÔ PHỎNG HỆ THỐNG PHÂN LUỒNG QUẢN LÝ RỦI RO (RKC)</h4>
+                <p style="font-size: 0.9rem; margin-top: 5px;">Thử chọn tình huống Lịch sử tuân thủ của Doanh nghiệp để xem kết quả Phân luồng thông quan:</p>
+
+                <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="sim-btn" style="background: var(--success-green);" onclick="simRisk('good')">DN Chấp hành tốt pháp luật</button>
+                    <button class="sim-btn" style="background: #D97706;" onclick="simRisk('medium')">DN Mới / Mặt hàng nhạy cảm</button>
+                    <button class="sim-btn" style="background: var(--bright-red);" onclick="simRisk('bad')">DN Có 3 lần gian lận thuế</button>
+                </div>
+
+                <div id="risk-result" style="margin-top: 20px; padding: 15px; border-radius: 8px; background: white; border: 1px solid #E2E8F0;">
+                    <p style="color: #64748B;">Nhấn nút bên trên để thực hiện Phân luồng tự động...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: SỔ ATA CARNET -->
+        <section id="tab-istanbul" class="section-panel">
+            <h3 style="color: var(--bright-red);">1.3.3. Công Ước Istanbul & Sổ ATA Carnet</h3>
+            <p style="margin-top: 8px; line-height: 1.6;">
+                Cho phép tạm nhập tái xuất hàng hóa bằng một bộ chứng từ duy nhất (Sổ ATA Carnet), <strong>miễn thuế nhập khẩu</strong> và không cần đặt cọc tiền thuế tại các nước tham gia.
+            </p>
+
+            <div class="simulator-container">
+                <h4 style="color: var(--bright-red);"><i class="fa-solid fa-passport"></i> KIỂM TRA ĐIỀU KIỆN SỬ DỤNG SỔ ATA CARNET (VÍ DỤ 3)</h4>
+                <p style="font-size: 0.9rem; margin-top: 5px;">Chọn loại hàng hóa doanh nghiệp chuẩn bị mang sang nước ngoài:</p>
+
+                <div style="margin-top: 10px;">
+                    <label style="display: block; margin: 5px 0; cursor: pointer;"><input type="radio" name="ata-item" value="fair" checked> 10 bộ máy quay phim tham gia Triển lãm 7 ngày tại Singapore</label>
+                    <label style="display: block; margin: 5px 0; cursor: pointer;"><input type="radio" name="ata-item" value="sample"> Hàng mẫu thương mại không bán</label>
+                    <label style="display: block; margin: 5px 0; cursor: pointer;"><input type="radio" name="ata-item" value="sell"> Lô hàng tiêu dùng mang đi bán chợ đêm</label>
+                </div>
+
+                <button class="sim-btn" style="margin-top: 10px;" onclick="checkATA()">Kiểm tra Quyền Lợi ATA Carnet</button>
+
+                <div id="ata-result" class="callout-box" style="margin-top: 15px; display: none;"></div>
+            </div>
+        </section>
+
+        <!-- TAB 7: TFA & ASEAN -->
+        <section id="tab-tfa-asean" class="section-panel">
+            <h3 style="color: var(--bright-red);">1.3.4. Hiệp Định TFA (WTO) & 1.3.5. Các Hiệp Định ASEAN</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 15px;">
+                <div style="background: var(--primary-blue); padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--accent-blue);"><i class="fa-solid fa-globe"></i> Hiệp định TFA (WTO)</h4>
+                    <p style="font-size: 0.9rem; margin-top: 8px; line-height: 1.5;">
+                        Tập trung tạo thuận lợi thương mại, công khai minh minh thông tin, triển khai thông quan trước khi hàng đến (ACI) tại các cảng biển lớn như Cát Lái, Hải Phòng.
+                    </p>
+                </div>
+
+                <div style="background: var(--soft-yellow); padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--bright-red);"><i class="fa-solid fa-flag"></i> Các Hiệp Định ASEAN</h4>
+                    <ul style="font-size: 0.85rem; margin-left: 15px; margin-top: 8px; line-height: 1.6;">
+                        <li><strong>ATIGA:</strong> Cắt giảm thuế quan nội khối, quy định xuất xứ (C/O Form D).</li>
+                        <li><strong>ASW (Một cửa ASEAN):</strong> Trao đổi C/O điện tử giữa các nước thành viên.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="simulator-container" style="text-align: center;">
+                <h4 style="color: var(--accent-blue);">MÔ PHỎNG LƯU CHUYỂN DỮ LIỆU C/O FORM D QUA ASW</h4>
+                <div style="display: flex; justify-content: space-around; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                    <div style="border: 2px solid var(--accent-blue); padding: 12px; border-radius: 8px; background: white; min-width: 120px;">
+                        <i class="fa-solid fa-building"></i><br><strong>DN Việt Nam</strong>
+                    </div>
+                    <i class="fa-solid fa-arrow-right fa-xl" style="color: var(--bright-red);"></i>
+                    <div style="border: 2px solid var(--bright-red); padding: 12px; border-radius: 8px; background: var(--soft-yellow); min-width: 120px;">
+                        <i class="fa-solid fa-server"></i><br><strong>Cổng NSW VN</strong>
+                    </div>
+                    <i class="fa-solid fa-arrow-right fa-xl" style="color: var(--bright-red);"></i>
+                    <div style="border: 2px solid var(--success-green); padding: 12px; border-radius: 8px; background: white; min-width: 120px;">
+                        <i class="fa-solid fa-network-wired"></i><br><strong>Cổng ASW ASEAN</strong>
+                    </div>
+                    <i class="fa-solid fa-arrow-right fa-xl" style="color: var(--bright-red);"></i>
+                    <div style="border: 2px solid var(--accent-blue); padding: 12px; border-radius: 8px; background: white; min-width: 120px;">
+                        <i class="fa-solid fa-customs"></i><br><strong>Hải Quan Nhập Khẩu</strong>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; color: #64748B; margin-top: 15px;">Dữ liệu chứng nhận xuất xứ được truyền hoàn toàn tự động, rút ngắn thời gian thông quan từ vài ngày xuống vài phút.</p>
+            </div>
+        </section>
+
+        <!-- TAB 8: TRẮC NGHIỆM & BÀI TẬP CỦNG CỐ -->
+        <section id="tab-quiz" class="section-panel">
+            <h3 style="color: var(--bright-red); margin-bottom: 5px;"><i class="fa-solid fa-graduation-cap"></i> BÀI TẬP CỦNG CỐ KIẾN THỨC VÀ KỸ NĂNG</h3>
+            <p style="margin-bottom: 20px; color: #64748B;">Bao gồm 7 bài tập tình huống lý luận hải quan và 6 bài tập thực hành nhập liệu - xử lý chứng từ trên Excel.</p>
+
+            <!-- PHẦN I: BÀI TẬP TÌNH HUỐNG VÀ LÝ THUYẾT -->
+            <h4 style="color: var(--accent-blue); border-bottom: 2px solid var(--primary-blue); padding-bottom: 5px; margin-bottom: 15px;">
+                <i class="fa-solid fa-list-check"></i> PHẦN I: TÌNH HUỐNG NGHIỆP VỤ HẢI QUAN (BÀI 1 - BÀI 7)
+            </h4>
+
+            <!-- BÀI 1 -->
+            <div class="exercise-card">
+                <div class="exercise-title"><i class="fa-solid fa-user-check" style="color: var(--accent-blue);"></i> Bài 1: Xác định người khai hải quan</div>
+                <div class="exercise-scenario">
+                    Công ty A tại Việt Nam nhập khẩu một lô hàng máy tính từ Nhật Bản. Công ty A ký hợp đồng thuê Công ty B là đại lý làm thủ tục hải quan để thực hiện khai báo và làm thủ tục thông quan.
+                </div>
+                <ol class="exercise-questions">
+                    <li>Trong trường hợp này, ai là người khai hải quan?</li>
+                    <li>Công ty B cần có điều kiện gì để được phép thực hiện khai báo hải quan?</li>
+                    <li>Ai chịu trách nhiệm về nội dung khai báo hải quan?</li>
+                </ol>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-1')"><i class="fa-regular fa-eye"></i> Xem Đáp Án / Gợi Ý</button>
+                <div id="ans-1" class="answer-box">
+                    <strong>Gợi ý đáp án:</strong><br>
+                    1. <strong>Người khai hải quan:</strong> Cả Công ty A (chủ hàng) hoặc Công ty B (với tư cách là Đại lý làm thủ tục hải quan đứng tên trên tờ khai theo ủy quyền) đều có thể là người khai hải quan.<br>
+                    2. <strong>Điều kiện của Công ty B:</strong> Phải có hợp đồng đại lý với Công ty A; nhân viên trực tiếp khai báo phải có chứng chỉ nghiệp vụ khai hải quan và Công ty B được Tổng cục Hải quan công nhận đủ điều kiện làm Đại lý làm thủ tục hải quan.<br>
+                    3. <strong>Trách nhiệm:</strong> Công ty B (Đại lý) chịu trách nhiệm trong phạm vi được ủy quyền theo hợp đồng đại lý và quy định pháp luật. Chủ hàng (Công ty A) chịu trách nhiệm về tính chính xác của thông tin, chứng từ cung cấp cho Đại lý.
+                </div>
+            </div>
+
+            <!-- BÀI 2 -->
+            <div class="exercise-card">
+                <div class="exercise-title"><i class="fa-solid fa-boxes-packing" style="color: var(--accent-blue);"></i> Bài 2: Xác định thủ tục hải quan</div>
+                <div class="exercise-scenario">
+                    Một lô hàng quần áo được nhập khẩu từ Hàn Quốc về cảng Hải Phòng. Khi hàng đến cảng, doanh nghiệp cần thực hiện các bước để làm thủ tục hải quan.
+                </div>
+                <ol class="exercise-questions">
+                    <li>Doanh nghiệp cần thực hiện những bước nào để làm thủ tục hải quan?</li>
+                    <li>Những loại chứng từ cơ bản nào cần chuẩn bị khi làm thủ tục hải quan?</li>
+                </ol>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-2')"><i class="fa-regular fa-eye"></i> Xem Đáp Án / Gợi Ý</button>
+                <div id="ans-2" class="answer-box">
+                    <strong>Gợi ý đáp án:</strong><br>
+                    1. <strong>Các bước thực hiện:</strong> (1) Khai báo tờ khai hải quan điện tử (qua VNACCS) -> (2) Tiếp nhận phản hồi phân luồng -> (3) Nộp/xuất trình hồ sơ hải quan hoặc kiểm tra thực tế hàng hóa (nếu luồng Vàng/Đỏ) -> (4) Nộp thuế & phí -> (5) Thông quan và lấy hàng khỏi cảng.<br>
+                    2. <strong>Chứng từ cơ bản:</strong> Tờ khai hải quan, Hóa đơn thương mại (Commercial Invoice), Vận đơn (Bill of Lading), Bảng kê chi tiết hàng hóa (Packing List), Chứng nhận xuất xứ (C/O Form AK hoặc VK để hưởng ưu đãi thuế).
+                </div>
+            </div>
+
+            <!-- BÀI 3 -->
+            <div class="exercise-card">
+                <div class="exercise-title"><i class="fa-solid fa-magnifying-glass" style="color: var(--bright-red);"></i> Bài 3: Kiểm tra và giám sát hải quan</div>
+                <div class="exercise-scenario">
+                    Một lô hàng điện tử nhập khẩu được hệ thống hải quan phân vào luồng đỏ.
+                </div>
+                <ol class="exercise-questions">
+                    <li>Luồng đỏ trong hải quan có ý nghĩa gì?</li>
+                    <li>Khi lô hàng vào luồng đỏ, cơ quan hải quan sẽ thực hiện những hoạt động gì?</li>
+                </ol>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-3')"><i class="fa-regular fa-eye"></i> Xem Đáp Án / Gợi Ý</button>
+                <div id="ans-3" class="answer-box">
+                    <strong>Gợi ý đáp án:</strong><br>
+                    1. <strong>Ý nghĩa Luồng đỏ:</strong> Mức độ rủi ro cao nhất trong phân luồng quản lý rủi ro. Yêu cầu phải kiểm tra chi tiết cả hồ sơ chứng từ lẫn kiểm tra thực tế hàng hóa.<br>
+                    2. <strong>Hoạt động của Hải quan:</strong> Cán bộ hải quan sẽ đối chiếu chi tiết bộ hồ sơ giấy/điện tử, sau đó tiến hành kiểm tra thực tế lô hàng (bằng máy soi container hoặc mở thùng kiểm tra thủ công với tỷ lệ 5%, 10% hoặc 100% lô hàng) để xác định đúng chủng loại, số lượng, mã HS và xuất xứ.
+                </div>
+            </div>
+
+            <!-- BÀI 4 -->
+            <div class="exercise-card">
+                <div class="exercise-title"><i class="fa-solid fa-truck-arrow-right" style="color: var(--accent-blue);"></i> Bài 4: Hàng hóa quá cảnh</div>
+                <div class="exercise-scenario">
+                    Một doanh nghiệp tại Thái Lan vận chuyển hàng hóa qua lãnh thổ Việt Nam để xuất khẩu sang Lào.
+                </div>
+                <ol class="exercise-questions">
+                    <li>Đây là loại hình hàng hóa gì?</li>
+                    <li>Hàng hóa quá cảnh có phải làm thủ tục hải quan không?</li>
+                </ol>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-4')"><i class="fa-regular fa-eye"></i> Xem Đáp Án / Gợi Ý</button>
+                <div id="ans-4" class="answer-box">
+                    <strong>Gợi ý đáp án:</strong><br>
+                    1. <strong>Loại hình hàng hóa:</strong> Hàng hóa quá cảnh (Transit cargo).<br>
+                    2. <strong>Thủ tục hải quan:</strong> Có. Hàng hóa quá cảnh vẫn phải thực hiện thủ tục hải quan (khai báo tờ khai quá cảnh, niêm phong hải quan hoặc chịu sự giám sát hải quan từ cửa khẩu nhập đến cửa khẩu xuất).
+                </div>
+            </div>
+
+            <!-- BÀI 5 -->
+            <div class="exercise-card">
+                <div class="exercise-title"><i class="fa-solid fa-triangle-exclamation" style="color: #D97706;"></i> Bài 5: Trách nhiệm của người khai hải quan</div>
+                <div class="exercise-scenario">
+                    Một doanh nghiệp khai báo sai tên hàng và mã HS khi nhập khẩu hàng hóa, dẫn đến việc tính thuế thấp hơn so với quy định.
+                </div>
+                <ol class="exercise-questions">
+                    <li>Doanh nghiệp có vi phạm quy định về hải quan hay không?</li>
+                    <li>Ai chịu trách nhiệm về nội dung khai báo hải quan?</li>
+                </ol>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-5')"><i class="fa-regular fa-eye"></i> Xem Đáp Án / Gợi Ý</button>
+                <div id="ans-5" class="answer-box">
+                    <strong>Gợi ý đáp án:</strong><br>
+                    1. <strong>Vi phạm:</strong> Có. Doanh nghiệp đã vi phạm hành vi khai sai dẫn đến thiếu số tiền thuế phải nộp (gian lận/ẩn lậu thuế hành chính).<br>
+                    2. <strong>Trách nhiệm:</strong> Người khai hải quan (Chủ hàng hoặc Đại lý hải quan được ủy quyền) phải chịu trách nhiệm trước pháp luật về tính chính xác, trung thực của thông tin khai báo. Doanh nghiệp sẽ bị truy thu thuế và xử phạt vi phạm hành chính.
+                </div>
+            </div>
+
+            <!-- BÀI 6 -->
+            <div class="exercise-card">
+                <div class="exercise-title"><i class="fa-solid fa-scale-balanced" style="color: var(--accent-blue);"></i> Bài 6: Vai trò của hải quan trong thương mại quốc tế</div>
+                <div class="exercise-scenario">
+                    Một doanh nghiệp logistics cho rằng việc kiểm tra hải quan làm chậm quá trình thông quan và ảnh hưởng đến hoạt động kinh doanh.
+                </div>
+                <ol class="exercise-questions">
+                    <li>Theo bạn, hoạt động kiểm tra hải quan có vai trò gì trong quản lý nhà nước?</li>
+                    <li>Vì sao cần cân bằng giữa tạo thuận lợi thương mại và kiểm soát hải quan?</li>
+                </ol>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-6')"><i class="fa-regular fa-eye"></i> Xem Đáp Án / Gợi Ý</button>
+                <div id="ans-6" class="answer-box">
+                    <strong>Gợi ý đáp án:</strong><br>
+                    1. <strong>Vai trò quản lý:</strong> Bảo vệ an ninh quốc gia, chống buôn lậu, hàng giả, gian lận thương mại, bảo vệ môi trường/sức khỏe cộng đồng và đảm bảo thu đúng, thu đủ thuế cho ngân sách.<br>
+                    2. <strong>Tại sao cần cân bằng:</strong> Nếu kiểm soát quá chặt sẽ gây ùn tắc, tăng chi phí logistics cho doanh nghiệp, giảm cạnh tranh quốc gia. Ngược lại, nếu thả lỏng sẽ nguy cơ rủi ro an ninh, thất thu thuế. Do đó, việc ứng dụng quản lý rủi ro (Hiệp định TFA) giúp giải quyết bài toán này.
+                </div>
+            </div>
+
+            <!-- BÀI 7 -->
+            <div class="exercise-card">
+                <div class="exercise-title"><i class="fa-solid fa-laptop-code" style="color: var(--accent-blue);"></i> Bài 7: Hải quan điện tử</div>
+                <div class="exercise-scenario">
+                    Một doanh nghiệp xuất nhập khẩu trước đây làm thủ tục hải quan bằng hồ sơ giấy. Hiện nay doanh nghiệp chuyển sang khai báo hải quan điện tử.
+                </div>
+                <ol class="exercise-questions">
+                    <li>Hải quan điện tử là gì?</li>
+                    <li>Việc áp dụng hải quan điện tử mang lại lợi ích gì cho doanh nghiệp?</li>
+                </ol>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-7')"><i class="fa-regular fa-eye"></i> Xem Đáp Án / Gợi Ý</button>
+                <div id="ans-7" class="answer-box">
+                    <strong>Gợi ý đáp án:</strong><br>
+                    1. <strong>Khái niệm:</strong> Hải quan điện tử là hình thức khai báo, tiếp nhận, xử lý thông tin tờ khai và thông quan hàng hóa thông qua hệ thống phần mềm dữ liệu điện tử (VNACCS/VCIS) thay vì hồ sơ giấy truyền thống.<br>
+                    2. <strong>Lợi ích:</strong> Khai báo 24/7 mọi lúc mọi nơi; tiết kiệm thời gian và chi phí đi lại; giảm thiểu chứng từ giấy; rút ngắn thời gian thông quan (Luồng xanh chỉ mất vài giây); minh bạch hóa quy trình.
+                </div>
+            </div>
+
+
+            <!-- PHẦN II: BÀI TẬP THỰC HÀNH EXCEL VÀ CHỨNG TỪ -->
+            <h4 style="color: #107C41; border-bottom: 2px solid #107C41; padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px;">
+                <i class="fa-solid fa-file-excel"></i> PHẦN II: THỰC HÀNH XỬ LÝ DỮ LIỆU EXCEL & CHỨNG TỪ (BÀI 8 - BÀI 13)
+            </h4>
+
+            <!-- BÀI 8 -->
+            <div class="exercise-card excel-type">
+                <div class="exercise-title">
+                    <span class="excel-badge">EXCEL</span> Bài 8: Nhập thông tin doanh nghiệp xuất nhập khẩu
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Yêu cầu:</strong> Sinh viên tạo bảng Excel, nhập dữ liệu sau và sắp xếp danh sách theo cột Quốc gia.</p>
+                
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên doanh nghiệp</th>
+                            <th>Mã số thuế</th>
+                            <th>Quốc gia</th>
+                            <th>Ngành nghề</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Công ty TNHH Minh Phát</td><td>0301234567</td><td>Việt Nam</td><td>Nhập khẩu điện tử</td></tr>
+                        <tr><td>2</td><td>ABC Electronics Co., Ltd</td><td>JP908765432</td><td>Nhật Bản</td><td>Xuất khẩu thiết bị</td></tr>
+                        <tr><td>3</td><td>Global Trading Ltd</td><td>KR678123456</td><td>Hàn Quốc</td><td>Xuất khẩu hàng tiêu dùng</td></tr>
+                        <tr><td>4</td><td>Shenzhen Technology Co.</td><td>CN789456123</td><td>Trung Quốc</td><td>Xuất khẩu thiết bị</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BÀI 9 -->
+            <div class="exercise-card excel-type">
+                <div class="exercise-title">
+                    <span class="excel-badge">EXCEL</span> Bài 9: Nhận diện thông tin từ hóa đơn thương mại (Invoice)
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Yêu cầu:</strong> Nhập dữ liệu vào Excel và Sử dụng công thức <code style="background:#E2E8F0; padding:2px 5px;">=SUM(E2:E4)</code> để tính tổng giá trị nhập khẩu.</p>
+                
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Số Invoice</th>
+                            <th>Ngày</th>
+                            <th>Người bán</th>
+                            <th>Người mua</th>
+                            <th>Tổng trị giá (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>INV001</td><td>05/01/2025</td><td>ABC Electronics</td><td>Minh Phát</td><td>15000</td></tr>
+                        <tr><td>INV002</td><td>08/01/2025</td><td>Shenzhen Tech</td><td>Minh Phát</td><td>12000</td></tr>
+                        <tr><td>INV003</td><td>10/01/2025</td><td>Global Trading</td><td>Minh Phát</td><td>9000</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BÀI 10 -->
+            <div class="exercise-card excel-type">
+                <div class="exercise-title">
+                    <span class="excel-badge">EXCEL</span> Bài 10: Nhận diện thông tin từ Packing List
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Yêu cầu:</strong> Nhập dữ liệu vào Excel và Tính tổng số lượng hàng hóa (Dùng hàm <code style="background:#E2E8F0; padding:2px 5px;">=SUM(...)</code>).</p>
+                
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Tên hàng</th>
+                            <th>Số kiện</th>
+                            <th>Số lượng</th>
+                            <th>Trọng lượng (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Camera giám sát</td><td>10</td><td>200</td><td>150</td></tr>
+                        <tr><td>Quạt tản nhiệt</td><td>8</td><td>300</td><td>120</td></tr>
+                        <tr><td>Máy xay sinh tố</td><td>12</td><td>180</td><td>200</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BÀI 11 -->
+            <div class="exercise-card excel-type">
+                <div class="exercise-title">
+                    <span class="excel-badge">EXCEL</span> Bài 11: Xác định thông tin khai báo hải quan
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Yêu cầu:</strong> Sinh viên lập bảng Excel, hoàn thiện bảng và giải thích mỗi thông tin được lấy từ chứng từ nào.</p>
+                
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Nội dung khai báo</th>
+                            <th>Nguồn chứng từ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Tên hàng</td><td>Invoice</td></tr>
+                        <tr><td>2</td><td>Số lượng</td><td>Packing List</td></tr>
+                        <tr><td>3</td><td>Trọng lượng</td><td>Packing List</td></tr>
+                        <tr><td>4</td><td>Trị giá</td><td>Invoice</td></tr>
+                        <tr><td>5</td><td>Xuất xứ</td><td>C/O</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BÀI 12 -->
+            <div class="exercise-card excel-type">
+                <div class="exercise-title">
+                    <span class="excel-badge">EXCEL</span> Bài 12: Chuẩn bị dữ liệu cho tờ khai hải quan
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Yêu cầu:</strong> Nhập dữ liệu vào Excel và tính tổng trị giá nhập khẩu.</p>
+                
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên hàng</th>
+                            <th>Quốc gia xuất khẩu</th>
+                            <th>Số lượng</th>
+                            <th>Trị giá (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Camera giám sát</td><td>Nhật Bản</td><td>200</td><td>10000</td></tr>
+                        <tr><td>2</td><td>Quạt tản nhiệt</td><td>Trung Quốc</td><td>300</td><td>5000</td></tr>
+                        <tr><td>3</td><td>Máy xay sinh tố</td><td>Hàn Quốc</td><td>180</td><td>4000</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BÀI 13 -->
+            <div class="exercise-card excel-type">
+                <div class="exercise-title">
+                    <span class="excel-badge">EXCEL</span> Bài 13: Lập danh mục chứng từ hải quan
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Yêu cầu:</strong> Sinh viên tạo bảng Excel và điền dấu (X) xác định chứng từ nào bắt buộc khi làm thủ tục hải quan.</p>
+                
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Chứng từ</th>
+                            <th>Bắt buộc (X)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Hợp đồng ngoại thương (Sales Contract)</td><td></td></tr>
+                        <tr><td>2</td><td>Hóa đơn thương mại (Commercial Invoice)</td><td></td></tr>
+                        <tr><td>3</td><td>Bảng kê chi tiết hàng hóa (Packing List)</td><td></td></tr>
+                        <tr><td>4</td><td>Vận đơn (Bill of Lading)</td><td></td></tr>
+                        <tr><td>5</td><td>Chứng nhận xuất xứ (C/O)</td><td></td></tr>
+                    </tbody>
+                </table>
+                <button class="btn-toggle-answer" onclick="toggleAnswer('ans-13')"><i class="fa-regular fa-eye"></i> Xem Gợi Ý Đáp Án Bài 13</button>
+                <div id="ans-13" class="answer-box">
+                    <strong>Gợi ý đáp án Bài 13:</strong><br>
+                    - <strong>Bắt buộc cơ bản:</strong> Tờ khai hải quan, Commercial Invoice, Vận đơn (Bill of Lading).<br>
+                    - <strong>Cần thiết/Theo yêu cầu:</strong> Packing List (thường luôn đi kèm để kiểm hàng), C/O (Bắt buộc nếu muốn hưởng thuế ưu đãi đặc biệt), Hợp đồng (Lưu hồ sơ DN / trình khi hải quan yêu cầu tham vấn giá).
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 9 MỚI BỔ SUNG: TAB KIỂM TRA & LUYỆN TẬP 20 BÀI TẬP CHƯƠNG -->
+        <section id="tab-test-exam" class="section-panel">
+            <!-- THANH ĐIỀU KHIỂN XUẤT PDF -->
+            <div class="pdf-export-controls">
+                <div>
+                    <h3 style="color: var(--bright-red);"><i class="fa-solid fa-file-signature"></i> BÀI KIỂM TRA LUYỆN TẬP CHƯƠNG 1</h3>
+                    <p style="font-size: 0.85rem; color: #64748B;">Làm bài trực tiếp và kết xuất file PDF chuẩn A4 để nộp cho Giảng viên.</p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div style="display: flex; gap: 8px; align-items: center; background: #F1F5F9; padding: 6px 12px; border-radius: 5px;">
+                        <label style="font-size: 0.85rem; font-weight: bold;"><i class="fa-solid fa-file-pdf"></i> Hướng A4:</label>
+                        <select id="pdf-orientation" style="padding: 4px; border-radius: 4px; border: 1px solid #CBD5E1; font-size: 0.85rem;">
+                            <option value="portrait">Khổ A4 Dọc (Portrait)</option>
+                            <option value="landscape">Khổ A4 Ngang (Landscape)</option>
+                        </select>
+                    </div>
+                    <button class="sim-btn" onclick="exportToPDF()" style="background: var(--success-green); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-file-export"></i> KẾT XUẤT FILE PDF NỘP BÀI
+                    </button>
+                </div>
+            </div>
+
+            <!-- THÔNG TIN SINH VIÊN -->
+            <div class="student-info-box">
+                <h4 style="color: var(--accent-blue); margin-bottom: 5px;"><i class="fa-solid fa-id-card"></i> THÔNG TIN SINH VIÊN THỰC HIỆN</h4>
+                <div class="student-info-grid">
+                    <div class="form-group">
+                        <label for="student-name">Họ và tên sinh viên: <span style="color: red;">*</span></label>
+                        <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn A" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-id">Mã số sinh viên (MSSV): <span style="color: red;">*</span></label>
+                        <input type="text" id="student-id" placeholder="Ví dụ: 22001122" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-class">Lớp / Khóa học:</label>
+                        <input type="text" id="student-class" placeholder="Ví dụ: LOG01 - K16">
+                    </div>
+                </div>
+            </div>
+
+            <!-- HỆ THỐNG 20 BÀI TẬP LUYỆN TẬP CÓ HIỂN THỊ ĐÁP ÁN KHI VÀO QUYỀN GV -->
+            <div id="student-exam-form">
+                <h4 style="color: var(--bright-red); border-bottom: 2px solid var(--primary-blue); padding-bottom: 5px; margin-bottom: 15px;">
+                    DANH SÁCH 20 BÀI TẬP LUYỆN TẬP CỦNG CỐ CẤP CHƯƠNG
+                </h4>
+
+                <!-- BÀI 1 -->
+                <div class="student-test-item">
+                    <h5>Bài 1: Khái niệm về Nghiệp vụ Hải quan là gì?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex1" value="A"> A. Hoạt động thu thuế nội địa của Nhà nước đối với doanh nghiệp.</label>
+                        <label><input type="radio" name="ex1" value="B"> B. Toàn bộ các hoạt động kiểm tra, giám sát, quản lý hàng hóa, phương tiện VTXNK và thu thuế XNK.</label>
+                        <label><input type="radio" name="ex1" value="C"> C. Dịch vụ vận chuyển hàng hóa quốc tế của các công ty Logistics.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>B</strong>. Nghiệp vụ Hải quan bao gồm kiểm tra, giám sát, quản lý hàng hóa, phương tiện VTXNK và thực thi chính sách thuế XNK.</div>
+                </div>
+
+                <!-- BÀI 2 -->
+                <div class="student-test-item">
+                    <h5>Bài 2: Ngày truyền thống của Hải quan Việt Nam được đánh dấu bằng Sắc lệnh nào?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex2" value="A"> A. Sắc lệnh 27/SL ngày 10/09/1945 do Chủ tịch Hồ Chí Minh ký.</label>
+                        <label><input type="radio" name="ex2" value="B"> B. Sắc lệnh thành lập Hải quan năm 1975.</label>
+                        <label><input type="radio" name="ex2" value="C"> C. Luật Hải quan ban hành năm 2001.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>A</strong>. Sắc lệnh 27/SL thành lập Sở Thuế quan và Thuế gián thu ký ngày 10/09/1945.</div>
+                </div>
+
+                <!-- BÀI 3 -->
+                <div class="student-test-item">
+                    <h5>Bài 3: Trọng tâm cốt lõi của Công ước Kyoto Sửa đổi (RKC) trong quản lý Hải quan là gì?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex3" value="A"> A. Thực hiện kiểm tra thực tế 100% tất cả các lô hàng XNK.</label>
+                        <label><input type="radio" name="ex3" value="B"> B. Chuyển từ kiểm tra truyền thống sang Quản lý Rủi ro (Risk Management) và Đơn giản hóa thủ tục.</label>
+                        <label><input type="radio" name="ex3" value="C"> C. Bãi bỏ hoàn toàn việc thu thuế xuất nhập khẩu.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>B</strong>. Chuyển sang phương pháp quản lý hiện đại dựa trên Quản lý Rủi ro.</div>
+                </div>
+
+                <!-- BÀI 4 -->
+                <div class="student-test-item">
+                    <h5>Bài 4: Hệ thống Mã HS chuẩn do Tổ chức Hải quan Thế giới (WCO) quy định gồm mấy chữ số?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex4" value="A"> A. 4 chữ số.</label>
+                        <label><input type="radio" name="ex4" value="B"> B. 6 chữ số.</label>
+                        <label><input type="radio" name="ex4" value="C"> C. 8 chữ số.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>B</strong>. WCO quy định chuẩn hóa 6 chữ số đầu tiên trên toàn thế giới.</div>
+                </div>
+
+                <!-- BÀI 5 -->
+                <div class="student-test-item">
+                    <h5>Bài 5: Ưu điểm cốt lõi nhất của Sổ ATA Carnet theo Công ước Istanbul là gì?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex5" value="A"> A. Cho phép tạm nhập tái xuất hàng hóa bằng 1 bộ chứng từ duy nhất và miễn nộp thuế/tiền cọc thuế tạm thời.</label>
+                        <label><input type="radio" name="ex5" value="B"> B. Được bán thẳng hàng hóa vào thị trường nội địa không cần khai báo.</label>
+                        <label><input type="radio" name="ex5" value="C"> C. Áp dụng cho mọi loại hàng tiêu dùng xuất khẩu vĩnh viễn.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>A</strong>. Tạm nhập tái xuất đơn giản, 1 chứng từ duy nhất và không phải nộp cọc tiền thuế.</div>
+                </div>
+
+                <!-- BÀI 6 -->
+                <div class="student-test-item">
+                    <h5>Bài 6: Cơ chế Một cửa ASEAN (ASW) cho phép các quốc gia thành viên trao đổi điện tử chứng từ nào?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex6" value="A"> A. Chứng nhận xuất xứ hàng hóa (C/O Form D điện tử).</label>
+                        <label><input type="radio" name="ex6" value="B"> B. Hóa đơn bán lẻ nội địa.</label>
+                        <label><input type="radio" name="ex6" value="C"> C. Giấy phép kinh doanh của doanh nghiệp.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>A</strong>. C/O Form D điện tử (e-Form D).</div>
+                </div>
+
+                <!-- BÀI 7 -->
+                <div class="student-test-item">
+                    <h5>Bài 7: Khi hệ thống VNACCS phản hồi tờ khai rơi vào "Luồng Vàng", doanh nghiệp cần làm gì?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex7" value="A"> A. Được thông quan ngay và lấy hàng về kho không cần trình chứng từ.</label>
+                        <label><input type="radio" name="ex7" value="B"> B. Nộp/Xuất trình bộ hồ sơ giấy/điện tử để Hải quan kiểm tra chi tiết chứng từ.</label>
+                        <label><input type="radio" name="ex7" value="C"> C. Đưa toàn bộ container ra bãi để kiểm tra thực tế hàng hóa.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>B</strong>. Luồng Vàng chỉ cần kiểm tra chi tiết bộ hồ sơ chứng từ.</div>
+                </div>
+
+                <!-- BÀI 8 -->
+                <div class="student-test-item">
+                    <h5>Bài 8: Trách nhiệm pháp lý chính của Đại lý làm thủ tục hải quan là gì?</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex8" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đại lý làm thủ tục hải quan chịu trách nhiệm trong phạm vi được ủy quyền theo hợp đồng đại lý, ký tên đóng dấu trên tờ khai hải quan và chịu trách nhiệm pháp lý về tính chính xác của thông tin do mình thực hiện khai báo.</div>
+                </div>
+
+                <!-- BÀI 9 -->
+                <div class="student-test-item">
+                    <h5>Bài 9: Nêu 3 chứng từ bắt buộc phải có trong bộ hồ sơ hải quan hàng nhập khẩu thương mại thông thường.</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex9" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> 3 chứng từ cốt lõi bắt buộc: (1) Tờ khai hải quan, (2) Hóa đơn thương mại (Commercial Invoice), (3) Vận tải đơn (Bill of Lading).</div>
+                </div>
+
+                <!-- BÀI 10 -->
+                <div class="student-test-item">
+                    <h5>Bài 10: Tại sao việc xác định đúng Mã HS lại có ý nghĩa quyết định đối với số thuế XNK phải nộp?</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex10" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Mỗi Mã HS sẽ gắn liền với một mức thuế suất Thuế Nhập khẩu/Thuế GTGT/Thuế TTĐB nhất định trong Biểu thuế XNK. Khai sai mã HS sẽ dẫn đến tính sai tiền thuế, bị áp vi phạm gian lận hoặc thiếu thuế.</div>
+                </div>
+
+                <!-- BÀI 11 -->
+                <div class="student-test-item">
+                    <h5>Bài 11: Phân biệt sự khác nhau cơ bản giữa Hóa đơn thương mại (Commercial Invoice) và Bảng kê chi tiết hàng hóa (Packing List).</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex11" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Invoice tập trung vào khía cạnh <strong>Tài chính/Giá trị</strong> (Đơn giá, Tổng tiền, Phương thức thanh toán). Packing List tập trung vào khía cạnh <strong>Hàng hải/Đóng gói</strong> (Số lượng kiện, Trọng lượng Gross/Net, Kích thước, Cách thức đóng thùng).</div>
+                </div>
+
+                <!-- BÀI 12 -->
+                <div class="student-test-item">
+                    <h5>Bài 12: Hãy nêu vai trò của Hiệp định Tạo thuận lợi Thương mại (TFA - WTO) đối với các doanh nghiệp XNK.</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex12" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> TFA giúp cắt giảm chi phí giao dịch, tăng tính minh bạch thông tin hải quan, cho phép xử lý dữ liệu trước khi hàng đến (ACI) và rút ngắn tối đa thời gian giải phóng hàng tại biên giới.</div>
+                </div>
+
+                <!-- BÀI 13 -->
+                <div class="student-test-item">
+                    <h5>Bài 13: Trường hợp doanh nghiệp nhập khẩu 100 chiếc Bàn phím máy tính (Mã HS: 8471.60.00). Thông tin số lượng và trị giá này lấy từ chứng từ nào trong bộ hồ sơ?</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex13" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Số lượng lấy từ Packing List / Invoice. Trị giá lấy trực tiếp từ Hóa đơn thương mại (Commercial Invoice). Mã HS đối chiếu từ catalogue/kỹ thuật và Danh mục biểu thuế.</div>
+                </div>
+
+                <!-- BÀI 14 -->
+                <div class="student-test-item">
+                    <h5>Bài 14: Sổ ATA Carnet KHÔNG được áp dụng cho trường hợp nào sau đây?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex14" value="A"> A. Hàng mang đi triển lãm, hội chợ quốc tế.</label>
+                        <label><input type="radio" name="ex14" value="B"> B. Thiết bị máy móc chuyên nghiệp mang đi biểu diễn/tác nghiệp.</label>
+                        <label><input type="radio" name="ex14" value="C"> C. Lô hàng tiêu dùng nhập khẩu mang về bán đứt tại siêu thị.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>C</strong>. Hàng hóa nhập khẩu tiêu dùng để bán đứt không thuộc diện tạm nhập tái xuất.</div>
+                </div>
+
+                <!-- BÀI 15 -->
+                <div class="student-test-item">
+                    <h5>Bài 15: Hệ thống VNACCS/VCIS là hệ thống công nghệ thông tin phục vụ hoạt động gì của Hải quan Việt Nam?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex15" value="A"> A. Thông quan tự động và quản lý hải quan điện tử.</label>
+                        <label><input type="radio" name="ex15" value="B"> B. Thu thuế thu nhập cá nhân.</label>
+                        <label><input type="radio" name="ex15" value="C"> C. Định vị vệ tinh các tàu biển chở hàng.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>A</strong>. Hệ thống thông quan tự động VNACCS/VCIS.</div>
+                </div>
+
+                <!-- BÀI 16 -->
+                <div class="student-test-item">
+                    <h5>Bài 16: Phân biệt ý nghĩa của Luồng Xanh và Luồng Đỏ trong hệ thống phân luồng rủi ro Hải quan.</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex16" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Luồng Xanh: Miễn kiểm tra hồ sơ và miễn kiểm tra thực tế hàng hóa, thông quan ngay. Luồng Đỏ: Mức rủi ro cao nhất, kiểm tra chi tiết cả bộ hồ sơ chứng từ VÀ kiểm tra thực tế hàng hóa.</div>
+                </div>
+
+                <!-- BÀI 17 -->
+                <div class="student-test-item">
+                    <h5>Bài 17: Hãy giải thích tại sao hành vi Khai sai Mã HS dẫn đến thiếu thuế lại bị xử phạt hành chính.</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex17" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Vì đây là hành vi vi phạm nghĩa vụ khai báo chính xác, trung thực của người khai hải quan, làm thất thu hoặc chậm trễ nguồn thu Ngân sách Nhà nước nên bị xử phạt vi phạm hành chính và truy thu thuế.</div>
+                </div>
+
+                <!-- BÀI 18 -->
+                <div class="student-test-item">
+                    <h5>Bài 18: Lợi ích của việc nộp Chứng nhận xuất xứ hàng hóa (C/O Form D) đối với doanh nghiệp là gì?</h5>
+                    <div class="test-options">
+                        <label><input type="radio" name="ex18" value="A"> A. Được hưởng thuế suất ưu đãi đặc biệt theo Hiệp định ATIGA.</label>
+                        <label><input type="radio" name="ex18" value="B"> B. Được miễn kiểm tra an ninh cửa khẩu.</label>
+                        <label><input type="radio" name="ex18" value="C"> C. Được hỗ trợ tiền cước vận chuyển quốc tế.</label>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Đáp án đúng là <strong>A</strong>. Giúp hàng hóa được cắt giảm hoặc miễn thuế nhập khẩu theo Hiệp định ATIGA.</div>
+                </div>
+
+                <!-- BÀI 19 -->
+                <div class="student-test-item">
+                    <h5>Bài 19: Trình bày vai trò của Hải quan trong việc bảo vệ an toàn cộng đồng và chống buôn lậu.</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex19" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> Kiểm soát, phát hiện và ngăn chặn hàng cấm (ma túy, vũ khí, chất nổ), thực phẩm bẩn, chất thải nguy hại, vi phạm sở hữu trí tuệ, bảo vệ an ninh kinh tế và sức khỏe nhân dân.</div>
+                </div>
+
+                <!-- BÀI 20 -->
+                <div class="student-test-item">
+                    <h5>Bài 20: Tóm tắt 3 kỹ năng quan trọng nhất mà sinh viên ngành Logistics/Khai báo Hải quan cần trang bị sau khi học xong Chương 1.</h5>
+                    <div class="student-answer-input">
+                        <textarea id="ans-ex20" placeholder="Trình bày ngắn gọn câu trả lời của sinh viên..."></textarea>
+                    </div>
+                    <div class="gv-answer-key"><strong>[ĐÁP ÁN CHUẨN GV]:</strong> 1) Tra cứu & phân loại chính xác mã HS; 2) Đọc hiểu & kiểm tra tính hợp lệ của bộ chứng từ XNK (Invoice, Packing List, C/O); 3) Thao tác & xử lý thông quy trình phân luồng trên hệ thống VNACCS.</div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL NHẬP MẬT KHẨU BẢO MẬT GIẢNG VIÊN -->
+    <div id="gv-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-lock"></i> XÁC NHẬN GIẢNG VIÊN</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 12px; color: #475569;">Vui lòng nhập mật khẩu xác minh quyền Giảng viên:</p>
+            <input type="password" id="gv-pass-input" placeholder="Nhập mật khẩu..." onkeyup="if(event.key==='Enter') verifyGVPass()">
+            <div class="modal-btns">
+                <button class="btn-modal btn-confirm" onclick="verifyGVPass()">Xác nhận</button>
+                <button class="btn-modal btn-cancel" onclick="closeGVModal()">Hủy bỏ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KHU VỰC RENDER KẾT XUẤT PDF ẨN DÙNG CHO HTML2PDF -->
+    <div id="pdf-render-area" style="display: none;"></div>
+
+    <!-- JAVASCRIPT XỬ LÝ TƯƠNG TÁC -->
+    <script>
+        // TRẠNG THÁI QUYỀN GIẢNG VIÊN
+        let isGVLoggedIn = false;
+        const GV_PASSWORD_SECRET = "CDCT@1976";
+
+        // Hàm xử lý khi bấm nút Chuyển chế độ GV
+        function handleGVToggle() {
+            if (isGVLoggedIn) {
+                // Nếu đang đăng nhập GV -> Thoát về Sinh viên
+                isGVLoggedIn = false;
+                document.getElementById('role-badge').innerHTML = '<i class="fa-solid fa-user-graduate"></i> Chế độ: Sinh viên';
+                document.getElementById('role-badge').style.background = 'var(--soft-yellow)';
+                document.getElementById('role-badge').style.color = 'var(--bright-red)';
+                document.getElementById('btn-gv-text').innerText = 'Chuyển sang GV';
+                
+                // Ẩn tất cả đáp án chuẩn GV
+                const gvKeys = document.querySelectorAll('.gv-answer-key');
+                gvKeys.forEach(el => el.style.display = 'none');
+                
+                alert("Đã đăng xuất chế độ Giảng viên! Đã quay lại chế độ Sinh viên.");
+            } else {
+                // Mở Modal nhập Pass
+                document.getElementById('gv-pass-input').value = '';
+                document.getElementById('gv-modal').style.display = 'flex';
+                document.getElementById('gv-pass-input').focus();
+            }
+        }
+
+        // Đóng Modal
+        function closeGVModal() {
+            document.getElementById('gv-modal').style.display = 'none';
+        }
+
+        // Xác thực Mật khẩu GV
+        function verifyGVPass() {
+            const inputPass = document.getElementById('gv-pass-input').value;
+            if (inputPass === GV_PASSWORD_SECRET) {
+                isGVLoggedIn = true;
+                closeGVModal();
+
+                // Cập nhật giao diện
+                document.getElementById('role-badge').innerHTML = '<i class="fa-solid fa-user-shield"></i> Chế độ: GIẢNG VIÊN';
+                document.getElementById('role-badge').style.background = '#E6F4EA';
+                document.getElementById('role-badge').style.color = 'var(--success-green)';
+                document.getElementById('btn-gv-text').innerText = 'Thoát quyền GV';
+
+                // Hiện tất cả đáp án chuẩn GV trong Tab 9
+                const gvKeys = document.querySelectorAll('.gv-answer-key');
+                gvKeys.forEach(el => el.style.display = 'block');
+
+                alert("Xác thực Giảng viên thành công! Đáp án của 20 bài kiểm tra đã hiển thị.");
+            } else {
+                alert("Mật khẩu Giảng viên không chính xác! Vui lòng thử lại.");
+                document.getElementById('gv-pass-input').select();
+            }
+        }
+
+        // Hàm chuyển Tab
+        function switchTab(element, tabId) {
+            // 1. Ẩn tất cả các panel
+            const panels = document.querySelectorAll('.section-panel');
+            panels.forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            // 2. Bỏ class active ở tất cả menu items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // 3. Hiện tab được chọn
+            const targetPanel = document.getElementById(tabId);
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
+
+            // 4. Highlight menu item được bấm
+            if (element) {
+                element.classList.add('active');
+            }
+
+            // 5. Cập nhật Tiêu đề Header
+            const titleMap = {
+                'tab-overview': 'CHƯƠNG 1: MỤC TIÊU HỌC TẬP',
+                'tab-intro': '1.1 GIỚI THIỆU VỀ NGHIỆP VỤ HẢI QUAN',
+                'tab-history': '1.2 LỊCH SỬ HÌNH THÀNH & PHÁT TRIỂN HẢI QUAN VN',
+                'tab-hs': '1.3.1 CÔNG ƯỚC HS VỀ MÃ HÓA HÀNG HÓA',
+                'tab-kyoto': '1.3.2 CÔNG ƯỚC KYOTO SỬA ĐỔI (RKC)',
+                'tab-istanbul': '1.3.3 CÔNG ƯỚC ISTANBUL VỀ SỔ ATA CARNET',
+                'tab-tfa-asean': '1.3.4 & 1.3.5 HIỆP ĐỊNH TFA & ASEAN',
+                'tab-quiz': 'BÀI TẬP CỦNG CỐ KIẾN THỨC VÀ KỸ NĂNG',
+                'tab-test-exam': '9. BÀI KIỂM TRA & LUYỆN TẬP 20 BÀI TẬP CHƯƠNG 1'
+            };
+            document.getElementById('current-title').innerText = titleMap[tabId] || 'TỔNG QUAN HẢI QUAN';
+        }
+
+        // Ẩn / Hiện Đáp Án Bài Tập Tab 8
+        function toggleAnswer(ansId) {
+            const box = document.getElementById(ansId);
+            if (box.style.display === 'block') {
+                box.style.display = 'none';
+            } else {
+                box.style.display = 'block';
+            }
+        }
+
+        // Chi tiết Lịch sử Hải quan
+        function showHistoryDetail(element, stage) {
+            const historyData = {
+                1: "Trước 1945: Hệ thống thuế quan tập trung thu thuế tối đa cho chính quyền thực dân Pháp, chưa có tính chất phục vụ phát triển thương mại tự do.",
+                2: "1945 - 1975: Sắc lệnh 27/SL ngày 10/9/1945 đánh dấu mốc sinh nhật Hải quan VN. Hải quan đóng vai trò kiểm soát vật tư phục vụ hai cuộc kháng chiến vĩ đại.",
+                3: "1975 - 1990: Thống nhất lực lượng Hải quan 2 miền Nam - Bắc. Quản lý khép kín trong nền kinh tế kế hoạch hóa tập trung.",
+                4: "1990 - 2000: Việt Nam bắt đầu hội nhập. Hải quan đẩy mạnh ứng dụng Tin học hóa nghiệp vụ, giảm bớt thủ tục thủ công.",
+                5: "2000 - Nay: Bùng nổ Hải quan Điện tử (VNACCS/VCIS), Cơ chế Một cửa Quốc gia (NSW) và Một cửa ASEAN (ASW). Hướng tới Hải quan Số thông minh."
+            };
+
+            document.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('history-detail-text').innerText = historyData[stage];
+        }
+
+        // Mô phỏng HS Code
+        function updateHSSimulator() {
+            const val = document.getElementById('hs-select').value;
+            const resBox = document.getElementById('hs-result');
+
+            if(val === 'keyboard') {
+                resBox.innerHTML = `
+                    <h4 style="color:var(--bright-red)">Mã HS Xác Định: 8471.60.00</h4>
+                    <p style="margin-top:5px; font-size:0.9rem;">
+                        - thuộc <strong>Chương 84</strong> (Máy vi tính, thiết bị cơ khí)<br>
+                        - Mô tả chuẩn: Bàn phím nhập dữ liệu.<br>
+                        👉 <strong>Ý nghĩa:</strong> Mã 8471.60 áp dụng giống hệt nhau tại Hàn Quốc, Việt Nam và Mỹ, giúp việc xác định thuế suất hoàn toàn nhất quán.
+                    </p>`;
+            } else {
+                resBox.innerHTML = `
+                    <h4 style="color:var(--bright-red)">Mã HS Xác Định: 8509.80.30</h4>
+                    <p style="margin-top:5px; font-size:0.9rem;">
+                        - thuộc <strong>Chương 85</strong> (Thiết bị điện, điện tử)<br>
+                        - Mô tả chuẩn: Quạt điện dùng trong gia đình.<br>
+                        👉 <strong>Ý nghĩa:</strong> Làm căn cứ chính xác để Hải quan tính Thuế Nhập Khẩu và Thuế GTGT.
+                    </p>`;
+            }
+        }
+
+        // Mô phỏng Phân luồng rủi ro (Kyoto)
+        function simRisk(type) {
+            const resDiv = document.getElementById('risk-result');
+            if(type === 'good') {
+                resDiv.innerHTML = `
+                    <h4>Kết quả Hệ thống VNACCS:</h4>
+                    <span class="channel-tag channel-green"><i class="fa-solid fa-check-circle"></i> LUỒNG XANH</span>
+                    <p style="margin-top:10px; font-size:0.9rem;">
+                        <strong>Hành động Hải quan:</strong> Miễn kiểm tra hồ sơ giấy, miễn kiểm tra thực tế hàng hóa. Thông quan tự động trong vài giây!
+                    </p>`;
+            } else if(type === 'medium') {
+                resDiv.innerHTML = `
+                    <h4>Kết quả Hệ thống VNACCS:</h4>
+                    <span class="channel-tag channel-yellow"><i class="fa-solid fa-triangle-exclamation"></i> LUỒNG VÀNG</span>
+                    <p style="margin-top:10px; font-size:0.9rem;">
+                        <strong>Hành động Hải quan:</strong> Kiểm tra chi tiết hồ sơ giấy/chứng từ điện tử. Nếu hợp lệ sẽ cho thông quan, không cần mở container.
+                    </p>`;
+            } else {
+                resDiv.innerHTML = `
+                    <h4>Kết quả Hệ thống VNACCS:</h4>
+                    <span class="channel-tag channel-red"><i class="fa-solid fa-xmark-circle"></i> LUỒNG ĐỎ</span>
+                    <p style="margin-top:10px; font-size:0.9rem;">
+                        <strong>Hành động Hải quan:</strong> Kiểm tra chi tiết hồ sơ VÀ kiểm tra thực tế hàng hóa (mở 5%, 10% hoặc 100% container).
+                    </p>`;
+            }
+        }
+
+        // Kiểm tra ATA Carnet
+        function checkATA() {
+            const selectedElem = document.querySelector('input[name="ata-item"]:checked');
+            if(!selectedElem) return;
+            
+            const selected = selectedElem.value;
+            const resBox = document.getElementById('ata-result');
+            resBox.style.display = 'block';
+
+            if(selected === 'fair' || selected === 'sample') {
+                resBox.className = 'callout-box info';
+                resBox.innerHTML = `
+                    <h4 style="color:var(--accent-blue)"><i class="fa-solid fa-circle-check"></i> ĐỦ ĐIỀU KIỆN ÁP DỤNG SỔ ATA CARNET</h4>
+                    <p style="font-size:0.9rem; margin-top:5px;">Doanh nghiệp được <strong>MIỄN THUẾ NK tạm thời</strong>, không cần làm thủ tục cọc thuế và chỉ sử dụng 1 bộ sổ Carnet duy nhất khi xuất/nhập tại sân bay.</p>
+                `;
+            } else {
+                resBox.className = 'callout-box';
+                resBox.innerHTML = `
+                    <h4 style="color:var(--bright-red)"><i class="fa-solid fa-circle-xmark"></i> KHÔNG ĐỦ ĐIỀU KIỆN ATA CARNET</h4>
+                    <p style="font-size:0.9rem; margin-top:5px;">Hàng bán thương mại không thuộc phạm vi tạm nhập - tái xuất của Công ước Istanbul. Doanh nghiệp phải nộp thuế NK và làm thủ tục thông quan thông thường.</p>
+                `;
+            }
+        }
+
+        // HÀM KẾT XUẤT BÀI LÀM RA FILE PDF (TRANG A4 DỌC / NGANG)
+        function exportToPDF() {
+            const name = document.getElementById('student-name').value.trim();
+            const id = document.getElementById('student-id').value.trim();
+            const className = document.getElementById('student-class').value.trim() || 'Chưa điền';
+            const orientation = document.getElementById('pdf-orientation').value;
+
+            if (!name || !id) {
+                alert('Vui lòng điền đầy đủ Họ tên và Mã số sinh viên (MSSV) trước khi kết xuất file PDF!');
+                return;
+            }
+
+            // Thu thập dữ liệu bài làm
+            const pdfRenderContainer = document.getElementById('pdf-render-area');
+            let now = new Date();
+            let dateStr = `${now.getHours()}:${now.getMinutes()} - Ngày ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+
+            let contentHTML = `
+                <div class="pdf-header">
+                    <h2>BÀI LÀM KIỂM TRA LUYỆN TẬP CHƯƠNG 1</h2>
+                    <p style="font-size: 10pt; margin-top: 5px;"><strong>Môn Học:</strong> Khai Báo Hải Quan | <strong>Thời gian xuất bài:</strong> ${dateStr}</p>
+                </div>
+                <div class="pdf-student-info">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11pt;">
+                        <tr>
+                            <td style="padding: 4px; border: 1px solid #000;"><strong>Họ và tên Sinh viên:</strong> ${name}</td>
+                            <td style="padding: 4px; border: 1px solid #000;"><strong>Mã số sinh viên:</strong> ${id}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding: 4px; border: 1px solid #000;"><strong>Lớp / Khóa học:</strong> ${className}</td>
+                        </tr>
+                    </table>
+                </div>
+                <hr style="margin-bottom: 15px;">
+                <h4 style="font-size: 12pt; margin-bottom: 10px;">CHI TIẾT 20 BÀI TẬP VÀ BÀI LÀM CỦA SINH VIÊN:</h4>
+            `;
+
+            // Danh sách đề bài để gom câu trả lời
+            const questions = [
+                { id: 1, type: 'mcq', name: 'ex1', title: 'Bài 1: Khái niệm về Nghiệp vụ Hải quan là gì?' },
+                { id: 2, type: 'mcq', name: 'ex2', title: 'Bài 2: Ngày truyền thống Hải quan VN theo Sắc lệnh nào?' },
+                { id: 3, type: 'mcq', name: 'ex3', title: 'Bài 3: Trọng tâm cốt lõi của Công ước Kyoto Sửa đổi (RKC)?' },
+                { id: 4, type: 'mcq', name: 'ex4', title: 'Bài 4: Hệ thống Mã HS chuẩn do WCO quy định gồm mấy chữ số?' },
+                { id: 5, type: 'mcq', name: 'ex5', title: 'Bài 5: Ưu điểm cốt lõi nhất của Sổ ATA Carnet theo Công ước Istanbul?' },
+                { id: 6, type: 'mcq', name: 'ex6', title: 'Bài 6: Cơ chế Một cửa ASEAN (ASW) cho phép trao đổi chứng từ nào?' },
+                { id: 7, type: 'mcq', name: 'ex7', title: 'Bài 7: Khi tờ khai hải quan rơi vào "Luồng Vàng", doanh nghiệp cần làm gì?' },
+                { id: 8, type: 'text', textId: 'ans-ex8', title: 'Bài 8: Trách nhiệm pháp lý chính của Đại lý làm thủ tục hải quan là gì?' },
+                { id: 9, type: 'text', textId: 'ans-ex9', title: 'Bài 9: Nêu 3 chứng từ bắt buộc phải có trong bộ hồ sơ hải quan hàng nhập khẩu.' },
+                { id: 10, type: 'text', textId: 'ans-ex10', title: 'Bài 10: Ý nghĩa của việc xác định đúng Mã HS đối với số thuế XNK.' },
+                { id: 11, type: 'text', textId: 'ans-ex11', title: 'Bài 11: Phân biệt Commercial Invoice và Packing List.' },
+                { id: 12, type: 'text', textId: 'ans-ex12', title: 'Bài 12: Vai trò của Hiệp định TFA (WTO) đối với doanh nghiệp XNK.' },
+                { id: 13, type: 'text', textId: 'ans-ex13', title: 'Bài 13: Xác định chứng từ chứa thông tin số lượng & trị giá của lô hàng Bàn phím.' },
+                { id: 14, type: 'mcq', name: 'ex14', title: 'Bài 14: Sổ ATA Carnet KHÔNG được áp dụng cho trường hợp nào?' },
+                { id: 15, type: 'mcq', name: 'ex15', title: 'Bài 15: Hệ thống VNACCS/VCIS phục vụ hoạt động gì?' },
+                { id: 16, type: 'text', textId: 'ans-ex16', title: 'Bài 16: Phân biệt Luồng Xanh và Luồng Đỏ.' },
+                { id: 17, type: 'text', textId: 'ans-ex17', title: 'Bài 17: Tại sao hành vi Khai sai Mã HS bị xử phạt hành chính?' },
+                { id: 18, type: 'mcq', name: 'ex18', title: 'Bài 18: Lợi ích của việc nộp C/O Form D là gì?' },
+                { id: 19, type: 'text', textId: 'ans-ex19', title: 'Bài 19: Vai trò của Hải quan trong bảo vệ an toàn cộng đồng.' },
+                { id: 20, type: 'text', textId: 'ans-ex20', title: 'Bài 20: Tóm tắt 3 kỹ năng quan trọng nhất sau khi học xong Chương 1.' }
+            ];
+
+            questions.forEach(q => {
+                let studentAns = "";
+                if (q.type === 'mcq') {
+                    const checkedOption = document.querySelector(`input[name="${q.name}"]:checked`);
+                    studentAns = checkedOption ? `Đáp án đã chọn: [ ${checkedOption.value} ]` : '<em style="color:red;">(Chưa làm / Chưa chọn)</em>';
+                } else {
+                    const textVal = document.getElementById(q.textId).value.trim();
+                    studentAns = textVal ? textVal.replace(/\n/g, '<br>') : '<em style="color:red;">(Chưa làm / Chưa nhập nội dung)</em>';
+                }
+
+                contentHTML += `
+                    <div class="pdf-item">
+                        <div class="pdf-item-title">${q.title}</div>
+                        <div class="pdf-item-answer"><strong>Bài làm:</strong> ${studentAns}</div>
+                    </div>
+                `;
+            });
+
+            pdfRenderContainer.innerHTML = contentHTML;
+
+            // Thiết lập tùy chọn cho html2pdf
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `BaiLam_HaiQuan_${id}_${name.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: orientation }
+            };
+
+            // Tiến hành xuất PDF
+            pdfRenderContainer.style.display = 'block';
+            html2pdf().set(opt).from(pdfRenderContainer).save().then(() => {
+                pdfRenderContainer.style.display = 'none';
+            });
+        }
+
+        // Tự động kích hoạt khi load trang
+        window.addEventListener('DOMContentLoaded', (event) => {
+            updateHSSimulator();
+        });
+    </script>
+</body>
+</html>
