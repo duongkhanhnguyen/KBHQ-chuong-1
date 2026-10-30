@@ -590,6 +590,14 @@
 
         .btn-confirm { background: var(--success-green); color: white; }
         .btn-cancel { background: #64748B; color: white; }
+        /* TAB THỰC HÀNH */
+        .pr-ok { border: 2px solid var(--success-green) !important; background: #E6F4EA !important; }
+        .pr-bad { border: 2px solid var(--bright-red) !important; background: #FEF2F2 !important; }
+        .pr-in { padding: 6px 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 0.9rem; width: 100%; max-width: 230px; }
+        .pr-tag { display: inline-block; background: var(--bright-red); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 3px 9px; border-radius: 4px; }
+        .pr-hint { background: #E0F2FE; border-left: 4px solid #0284C7; padding: 8px 12px; font-size: 0.88rem; margin-bottom: 10px; border-radius: 0 6px 6px 0; }
+        .pr-sum { position: sticky; top: 0; z-index: 4; background: #fff; border: 2px solid var(--accent-blue); border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        .pr-st { font-weight: 700; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -622,6 +630,9 @@
             </li>
             <li class="nav-item" onclick="switchTab(this, 'tab-tfa-asean')">
                 <i class="fa-solid fa-network-wired"></i> 1.3.4 & 1.3.5 TFA & ASEAN
+            </li>
+            <li class="nav-item" onclick="switchTab(this, 'tab-practice')" style="background-color: #ECFDF5;">
+                <i class="fa-solid fa-flask-vial"></i> Thực hành (10 tiết)
             </li>
             <li class="nav-item" onclick="switchTab(this, 'tab-quiz')">
                 <i class="fa-solid fa-graduation-cap"></i> Bài tập Củng cố (13 Bài)
@@ -911,6 +922,24 @@
                 </div>
                 <p style="font-size: 0.85rem; color: #64748B; margin-top: 15px;">Dữ liệu chứng nhận xuất xứ được truyền hoàn toàn tự động, rút ngắn thời gian thông quan từ vài ngày xuống vài phút.</p>
             </div>
+        </section>
+
+        <!-- TAB THỰC HÀNH (10 TIẾT) -->
+        <section id="tab-practice" class="section-panel">
+            <h3 style="color: var(--bright-red); margin-bottom: 5px;"><i class="fa-solid fa-flask-vial"></i> THỰC HÀNH CHƯƠNG 1 (10 TIẾT)</h3>
+            <p style="margin-bottom: 12px; color: #64748B;">Mỗi tiết gồm một bài thực hành: tính toán, điền bảng, lập phương án. Số liệu là giả định phục vụ học tập. Nhập kết quả rồi bấm "Kiểm tra" để biết đúng/sai; phần lập phương án (khung văn bản) do Giảng viên đánh giá.</p>
+            <div class="student-info-box">
+                <div class="student-info-grid">
+                    <div class="form-group"><label>Họ và tên: <span style="color:red">*</span></label><input type="text" id="pr-name" placeholder="Nguyễn Văn A"></div>
+                    <div class="form-group"><label>MSSV: <span style="color:red">*</span></label><input type="text" id="pr-id" placeholder="22001122"></div>
+                    <div class="form-group"><label>Lớp / Khóa:</label><input type="text" id="pr-class" placeholder="LOG01 - K16"></div>
+                </div>
+            </div>
+            <div class="pr-sum">
+                <div><strong>Kết quả tự kiểm tra:</strong> <span id="pr-sum" style="color: var(--bright-red); font-weight: 700;">0 / 0 ô đúng</span></div>
+                <button class="sim-btn" style="background: var(--success-green);" onclick="prExport()"><i class="fa-solid fa-file-pdf"></i> Xuất PDF nộp bài</button>
+            </div>
+            <div id="pr-root"></div>
         </section>
 
         <!-- TAB 8: TRẮC NGHIỆM & BÀI TẬP CỦNG CỐ -->
@@ -1540,6 +1569,134 @@
             }
         }
 
+        // ===== TAB THỰC HÀNH: 10 BÀI / 10 TIẾT =====
+        const VQ = ['Bảo vệ lợi ích quốc gia', 'Thúc đẩy lưu thông hàng hóa', 'Kiểm soát thuế & phí', 'Thống kê thương mại'];
+        const ERA = ['Trước 1945', '1945–1975', '1975–1990', '1990–2000', '2000–nay'];
+        const LUONG = ['Luồng Xanh', 'Luồng Vàng', 'Luồng Đỏ'];
+        const YN = ['Có', 'Không'];
+        const PR = [
+            { ic: 'layer-group', t: 'Phân loại hoạt động theo vai trò của Hải quan', kn: '1.1.1 – 1.1.2',
+              sc: 'Hải quan cửa khẩu thực hiện 5 hoạt động dưới đây. Xác định mỗi hoạt động thuộc vai trò nào trong 4 vai trò của Hải quan.',
+              hint: 'Đối chiếu với 4 vai trò: bảo vệ lợi ích quốc gia, thúc đẩy lưu thông, kiểm soát thuế & phí, thống kê thương mại.',
+              rows: [['Phát hiện ma túy giấu trong lô hàng nhập khẩu', 's', VQ[0], VQ], ['Cho thông quan ngay tờ khai Luồng Xanh qua VNACCS', 's', VQ[1], VQ],
+                     ['Tính và thu thuế nhập khẩu của lô linh kiện', 's', VQ[2], VQ], ['Tổng hợp kim ngạch XNK tháng 10 theo mặt hàng', 's', VQ[3], VQ],
+                     ['Từ chối cho nhập lô hàng thuộc danh mục cấm', 's', VQ[0], VQ]],
+              plan: 'Lập sơ đồ 4–5 bước từ lúc doanh nghiệp khai báo điện tử đến khi hàng được thông quan (nêu bước nào Hải quan, bước nào doanh nghiệp thực hiện).',
+              gv: 'Đáp án: BV – LT – Thuế – TK – BV. Sơ đồ gợi ý: Khai điện tử → Hệ thống phân luồng → (kiểm tra hồ sơ/thực tế nếu cần) → Nộp thuế → Thông quan.' },
+            { ic: 'calculator', t: 'Tính trị giá và thuế nhập khẩu một lô hàng', kn: '1.1.2 (Kiểm soát thuế & phí)',
+              sc: 'Nhập khẩu lô hàng: giá FOB 50.000 USD; cước vận tải 2.500 USD; phí bảo hiểm 500 USD; tỷ giá 25.000 VND/USD; thuế nhập khẩu 10%; thuế GTGT 10% (giả định).',
+              hint: 'CIF = FOB + cước + bảo hiểm. Thuế NK = Trị giá tính thuế × thuế suất. Thuế GTGT = (Trị giá + Thuế NK) × 10%.',
+              rows: [['Trị giá CIF (USD)', 'n', 53000], ['Trị giá tính thuế (VND)', 'n', 1325000000], ['Thuế nhập khẩu (VND)', 'n', 132500000], ['Thuế GTGT (VND)', 'n', 145750000], ['Tổng thuế phải nộp (VND)', 'n', 278250000]],
+              gv: 'CIF = 53.000 USD → 1.325.000.000 đ; NK = 132.500.000 đ; GTGT = 1.457.500.000 × 10% = 145.750.000 đ; tổng = 278.250.000 đ.' },
+            { ic: 'warehouse', t: 'So sánh chi phí lưu bãi theo từng luồng thông quan', kn: '1.1.3 (Hải quan & Logistics)',
+              sc: 'Lô 5 container về cảng. Chi phí lưu bãi 600.000 đ/cont/ngày. Thời gian thông quan: Xanh 1 ngày, Vàng 2 ngày, Đỏ 4 ngày; riêng Luồng Đỏ phát sinh thêm phí kiểm hóa 1.500.000 đ/cont.',
+              hint: 'Chi phí = Số cont × Đơn giá × Số ngày (+ phí kiểm hóa nếu có).',
+              rows: [['Chi phí Luồng Xanh (VND)', 'n', 3000000], ['Chi phí Luồng Vàng (VND)', 'n', 6000000], ['Chi phí Luồng Đỏ (VND)', 'n', 19500000], ['Chênh lệch Đỏ – Xanh (VND)', 'n', 16500000]],
+              plan: 'Nêu 3 biện pháp doanh nghiệp nên làm để hạn chế bị phân Luồng Đỏ (khai đúng mã, trị giá, tuân thủ…).',
+              gv: 'Xanh 3.000.000; Vàng 6.000.000; Đỏ 12.000.000 + 7.500.000 = 19.500.000; chênh 16.500.000 đ. Biện pháp: khai chính xác, hồ sơ đầy đủ, giữ lịch sử tuân thủ tốt, dùng đại lý có nghiệp vụ.' },
+            { ic: 'landmark', t: 'Lập bảng mốc lịch sử Hải quan Việt Nam', kn: '1.2',
+              sc: 'Xếp mỗi sự kiện vào đúng thời kỳ, rồi tính tuổi truyền thống của Hải quan (thành lập 10/9/1945 theo Sắc lệnh 27/SL).',
+              hint: 'Dựa vào timeline ở tab 1.2. Số năm = 2026 – 1945.',
+              rows: [['Thu thuế phục vụ chính quốc Pháp', 's', ERA[0], ERA], ['Ban hành Sắc lệnh 27/SL', 's', ERA[1], ERA], ['Quản lý hàng viện trợ, mậu dịch quốc doanh', 's', ERA[2], ERA],
+                     ['Bắt đầu tin học hóa nghiệp vụ', 's', ERA[3], ERA], ['Triển khai VNACCS/VCIS, Một cửa quốc gia', 's', ERA[4], ERA], ['Kỷ niệm ngày truyền thống 10/9/2026 là bao nhiêu năm?', 'n', 81]],
+              gv: 'Thứ tự: Trước 1945 – 1945–1975 – 1975–1990 – 1990–2000 – 2000–nay; 2026 – 1945 = 81 năm.' },
+            { ic: 'barcode', t: 'Phân tích mã HS và hậu quả khai sai mã', kn: '1.3.1 (Công ước HS)',
+              sc: 'Mã HS 8509.80.30 (thiết bị điện gia dụng). Tách các thành phần của mã. Sau đó, lô hàng trị giá tính thuế 100.000.000 đ: mã đúng thuế suất 20%, doanh nghiệp khai sai sang mã thuế suất 5%; truy thu thuế thiếu và phạt 20% số thuế thiếu (giả định).',
+              hint: 'Cấu trúc [Chương][Nhóm][Phân nhóm][Mã riêng], mỗi phần 2 số. Phạt = 20% × thuế thiếu.',
+              rows: [['Chương', 't', '85'], ['Nhóm (2 số tiếp theo)', 't', '09'], ['Phân nhóm', 't', '80'], ['Mã riêng quốc gia', 't', '30'],
+                     ['Thuế đúng (VND)', 'n', 20000000], ['Thuế khai sai (VND)', 'n', 5000000], ['Thuế thiếu (VND)', 'n', 15000000], ['Tiền phạt (VND)', 'n', 3000000]],
+              gv: '85 | 09 | 80 | 30. Thuế đúng 20.000.000; khai sai 5.000.000; thiếu 15.000.000; phạt 3.000.000 (tổng truy thu + phạt = 18.000.000 đ).' },
+            { ic: 'scale-balanced', t: 'Chấm điểm rủi ro và phân luồng (RKC)', kn: '1.3.2 (Công ước Kyoto)',
+              sc: 'Điểm rủi ro = Σ(điểm × trọng số). Trọng số: Lịch sử tuân thủ 40%; Mặt hàng 25%; Tuyến/xuất xứ 15%; Trị giá khai báo 20%. DN X chấm (3; 5; 4; 3 điểm) – DN Y chấm (8; 7; 6; 9 điểm), thang 0–10.',
+              hint: 'Tổng < 4: Luồng Xanh; 4 – 7: Luồng Vàng; > 7: Luồng Đỏ.',
+              rows: [['Điểm rủi ro DN X', 'n', 3.65, 0.02], ['Phân luồng DN X', 's', LUONG[0], LUONG], ['Điểm rủi ro DN Y', 'n', 7.65, 0.02], ['Phân luồng DN Y', 's', LUONG[2], LUONG]],
+              plan: 'Lập danh mục hồ sơ và phương án làm việc với Hải quan khi DN Y bị phân Luồng Đỏ.',
+              gv: 'X = 1,2+1,25+0,6+0,6 = 3,65 → Xanh. Y = 3,2+1,75+0,9+1,8 = 7,65 → Đỏ. Hồ sơ: tờ khai, hợp đồng, invoice, packing list, vận đơn, giấy phép/chứng nhận chuyên ngành; chuẩn bị mở kiểm hóa.' },
+            { ic: 'passport', t: 'Phương án sử dụng Sổ ATA Carnet', kn: '1.3.3 (Công ước Istanbul)',
+              sc: 'Mang 10 máy quay (20.000 USD/máy) dự triển lãm 1 tháng. Nếu không dùng ATA phải đặt cọc thuế 15% giá trị hàng; lãi suất vốn 12%/năm. Phí cấp Sổ ATA và bảo lãnh: 450 USD (giả định).',
+              hint: 'Chi phí vốn = Tiền cọc × 12% × (1/12). Chênh lệch = Phí ATA – Chi phí vốn.',
+              rows: [['Máy quay triển lãm có dùng được ATA?', 's', 'Có', YN], ['Hàng mẫu thương mại không bán có dùng được ATA?', 's', 'Có', YN], ['Hàng tiêu dùng bán chợ đêm có dùng được ATA?', 's', 'Không', YN],
+                     ['Tổng trị giá hàng (USD)', 'n', 200000], ['Tiền đặt cọc nếu không dùng ATA (USD)', 'n', 30000], ['Chi phí vốn 1 tháng (USD)', 'n', 300], ['Chênh lệch Phí ATA – Chi phí vốn (USD)', 'n', 150]],
+              gv: 'Tổng 200.000; cọc 30.000; chi phí vốn 300; chênh 150 USD. ATA tốn thêm 150 USD nhưng không phải ứng 30.000 USD vốn và chỉ dùng một bộ chứng từ; nên chọn ATA khi vốn hạn chế hoặc đi nhiều nước.' },
+            { ic: 'bolt', t: 'Tính hiệu quả của thông quan trước khi hàng đến (TFA)', kn: '1.3.4 (Hiệp định TFA)',
+              sc: 'DN có 120 lô/tháng. Trước khi áp dụng, thông quan trung bình 72 giờ; sau khi xử lý trước khi hàng đến còn 24 giờ. Chi phí chờ, lưu bãi: 400.000 đ/lô/ngày.',
+              hint: '% giảm = (72 – 24) / 72. Giờ tiết kiệm = Số giờ giảm × Số lô. 24 giờ = 1 ngày.',
+              rows: [['Thời gian thông quan giảm (%)', 'n', 66.67, 0.1], ['Tổng giờ tiết kiệm mỗi tháng', 'n', 5760], ['Chi phí tiết kiệm mỗi tháng (VND)', 'n', 96000000]],
+              plan: 'Nêu 3 việc doanh nghiệp phải chuẩn bị để được thông quan trước khi hàng đến.',
+              gv: '48/72 = 66,67%; 48 × 120 = 5.760 giờ; 2 ngày × 120 × 400.000 = 96.000.000 đ. Việc chuẩn bị: khai trước, đầy đủ chứng từ điện tử, nộp thuế trước/bảo lãnh, theo dõi thông tin công khai.' },
+            { ic: 'handshake', t: 'Xét xuất xứ và ưu đãi thuế ATIGA (C/O Form D)', kn: '1.3.5 (Hiệp định ASEAN)',
+              sc: 'Hàng sản xuất tại ASEAN: giá FOB 10.000 USD; nguyên liệu không có xuất xứ ASEAN 5.500 USD. Tiêu chí RVC ≥ 40%. Thuế MFN 20%, thuế ATIGA 5%, giá tính thuế CIF 10.500 USD.',
+              hint: 'RVC = (FOB – Giá trị NVL không xuất xứ) / FOB × 100. Thuế = CIF × thuế suất.',
+              rows: [['RVC (%)', 'n', 45, 0.1], ['Đủ điều kiện hưởng ATIGA?', 's', 'Có', YN], ['Thuế theo MFN (USD)', 'n', 2100], ['Thuế theo ATIGA (USD)', 'n', 525], ['Tiết kiệm nhờ C/O Form D (USD)', 'n', 1575]],
+              gv: 'RVC = 4.500/10.000 = 45% ≥ 40% → đạt; MFN 2.100; ATIGA 525; tiết kiệm 1.575 USD.' },
+            { ic: 'clipboard-check', t: 'Tổng hợp: lập phương án thông quan trọn gói', kn: 'Toàn chương',
+              sc: 'Nhập 5.000 bàn phím (HS 8471.60.00) từ Thái Lan, FOB 8 USD/chiếc; cước + bảo hiểm 1.000 USD; tỷ giá 25.000. Thuế NK thông thường 10%, ưu đãi ATIGA 0% khi có C/O Form D; GTGT 10%.',
+              hint: 'Kết hợp các bài 2, 5, 9: tính CIF, thuế có C/O và không có C/O, rồi so sánh.',
+              rows: [['Trị giá CIF (USD)', 'n', 41000], ['Trị giá tính thuế (VND)', 'n', 1025000000], ['Tổng thuế khi có C/O Form D (VND)', 'n', 102500000], ['Tổng thuế khi không có C/O (VND)', 'n', 215250000], ['Chênh lệch (VND)', 'n', 112750000]],
+              plan: 'Lập (1) danh mục chứng từ cần chuẩn bị, (2) phương án thông quan: thời điểm khai, luồng dự kiến, rủi ro và cách xử lý.',
+              gv: 'CIF = 40.000+1.000 = 41.000 USD = 1.025.000.000 đ. Có C/O: GTGT = 102.500.000. Không C/O: NK 102.500.000 + GTGT 112.750.000 = 215.250.000. Chênh 112.750.000 đ. Chứng từ: tờ khai, hợp đồng, invoice, packing list, vận đơn, C/O Form D.' }
+        ];
+
+        function prRender() {
+            let h = '<table class="custom-table"><tr><th>Tiết</th><th>Nội dung thực hành</th><th>Phần lý thuyết</th></tr>';
+            PR.forEach((x, i) => h += `<tr><td>${i + 1}</td><td><a href="#pr-card-${i}">${x.t}</a></td><td>${x.kn}</td></tr>`);
+            h += '</table>';
+            PR.forEach((x, i) => {
+                h += `<div class="exercise-card" id="pr-card-${i}"><div class="exercise-title"><i class="fa-solid fa-${x.ic}" style="color: var(--accent-blue);"></i> <span class="pr-tag">TIẾT ${i + 1}</span> ${x.t}</div>
+                <div class="exercise-scenario">${x.sc}</div><div class="pr-hint"><strong>Gợi ý:</strong> ${x.hint}</div>
+                <table class="custom-table"><tr><th>Nội dung</th><th style="width:250px">Kết quả của em</th><th style="width:170px">Kiểm tra</th></tr>`;
+                x.rows.forEach((r, j) => {
+                    const id = `pr${i}_${j}`;
+                    const inp = r[1] === 's' ? `<select class="pr-in" id="${id}"><option value="">-- Chọn --</option>${r[3].map(o => `<option>${o}</option>`).join('')}</select>` : `<input class="pr-in" id="${id}" type="text" placeholder="${r[1] === 'n' ? 'Nhập số' : 'Nhập mã'}">`;
+                    h += `<tr><td>${r[0]}</td><td>${inp}</td><td class="pr-st" id="${id}s"></td></tr>`;
+                });
+                h += '</table>';
+                if (x.plan) h += `<p style="font-size:0.9rem; margin:8px 0 4px;"><strong><i class="fa-solid fa-pen"></i> Lập phương án:</strong> ${x.plan}</p><textarea id="prp${i}" style="width:100%; height:80px; padding:8px; border:1px solid #CBD5E1; border-radius:5px; font-family:inherit;"></textarea>`;
+                h += `<div style="margin-top:10px;"><button class="sim-btn" onclick="prCheck(${i})"><i class="fa-solid fa-check"></i> Kiểm tra</button></div>
+                <div class="gv-answer-key"><strong>Đáp án dành cho Giảng viên:</strong> ${x.gv}</div></div>`;
+            });
+            document.getElementById('pr-root').innerHTML = h;
+        }
+
+        function prNum(v) {
+            let s = String(v).replace(/\s/g, '');
+            s = /^\d{1,3}([.,]\d{3})+$/.test(s) ? s.replace(/[.,]/g, '') : s.replace(',', '.');
+            return s === '' ? NaN : Number(s);
+        }
+
+        function prCheck(i) {
+            PR[i].rows.forEach((r, j) => {
+                const el = document.getElementById(`pr${i}_${j}`), st = document.getElementById(`pr${i}_${j}s`);
+                const v = el.value.trim();
+                const good = r[1] === 'n' ? (!isNaN(prNum(v)) && Math.abs(prNum(v) - r[2]) <= (r[3] || 0.5)) : v.toLowerCase() === String(r[2]).toLowerCase();
+                el.classList.toggle('pr-ok', good);
+                el.classList.toggle('pr-bad', !good);
+                r.ok = good;
+                st.style.color = good ? 'var(--success-green)' : 'var(--bright-red)';
+                st.innerHTML = good ? '✔ Đúng' : '✘ Chưa đúng' + (isGVLoggedIn ? `<br><small>Đáp án: ${r[2].toLocaleString('vi-VN')}</small>` : '');
+            });
+            let ok = 0, all = 0;
+            PR.forEach(x => x.rows.forEach(r => { all++; if (r.ok) ok++; }));
+            document.getElementById('pr-sum').innerText = `${ok} / ${all} ô đúng`;
+        }
+
+        function prExport() {
+            const name = document.getElementById('pr-name').value.trim(), id = document.getElementById('pr-id').value.trim();
+            if (!name || !id) { alert('Vui lòng điền Họ tên và MSSV trước khi xuất PDF!'); return; }
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'padding:10px; background:#fff;';
+            wrap.innerHTML = `<div class="pdf-header"><h2>BÀI THỰC HÀNH CHƯƠNG 1 – TỔNG QUAN HẢI QUAN</h2><p style="font-size:10pt">Sinh viên: <strong>${name}</strong> | MSSV: <strong>${id}</strong> | Lớp: ${document.getElementById('pr-class').value || '—'} | Kết quả tự kiểm tra: ${document.getElementById('pr-sum').innerText}</p></div>`;
+            PR.forEach((x, i) => {
+                let h = `<div class="pdf-item"><div class="pdf-item-title">Tiết ${i + 1}: ${x.t}</div><table class="custom-table" style="font-size:9pt">`;
+                x.rows.forEach((r, j) => h += `<tr><td>${r[0]}</td><td style="width:35%">${document.getElementById(`pr${i}_${j}`).value || '—'}</td></tr>`);
+                h += '</table>';
+                if (x.plan) h += `<div class="pdf-item-answer"><strong>Phương án:</strong> ${(document.getElementById('prp' + i).value || '—').replace(/</g, '&lt;').replace(/\n/g, '<br>')}</div>`;
+                wrap.innerHTML += h + '</div>';
+            });
+            html2pdf().set({ margin: 10, filename: `ThucHanh_Chuong1_${id}.pdf`, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(wrap).save();
+        }
+        prRender();
+
         // Hàm chuyển Tab
         function switchTab(element, tabId) {
             // 1. Ẩn tất cả các panel
@@ -1574,6 +1731,7 @@
                 'tab-kyoto': '1.3.2 CÔNG ƯỚC KYOTO SỬA ĐỔI (RKC)',
                 'tab-istanbul': '1.3.3 CÔNG ƯỚC ISTANBUL VỀ SỔ ATA CARNET',
                 'tab-tfa-asean': '1.3.4 & 1.3.5 HIỆP ĐỊNH TFA & ASEAN',
+                'tab-practice': 'THỰC HÀNH CHƯƠNG 1 (10 TIẾT)',
                 'tab-quiz': 'BÀI TẬP CỦNG CỐ KIẾN THỨC VÀ KỸ NĂNG',
                 'tab-test-exam': '9. BÀI KIỂM TRA & LUYỆN TẬP 20 BÀI TẬP CHƯƠNG 1'
             };
